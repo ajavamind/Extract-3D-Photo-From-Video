@@ -5,5 +5,5 @@
 
 Mouse press displays crosshairs for setting the stereo window. 
 
-[Analog screenshot]{screenshots/screenshot_anaglyph.jpg}
+![Analog screenshot](screenshots/screenshot_anaglyph.jpg)
 
