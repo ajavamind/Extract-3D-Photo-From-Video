@@ -1,2 +1,6 @@
 # Extract-3D-Photo-From-Video
- Extract 3D/4V Photos From Left to Right Truck Motion Video
+ This processing.org Java application assists with left and right eye image pair extraction for creating 3D/4V stereo photos from motion videos that truck left to right.
+ 
+ Single key commands to use the app are defined in help.txt.
+
+Mouse press displays crosshairs for setting the stereo window. 

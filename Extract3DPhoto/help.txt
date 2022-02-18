@@ -1,0 +1,41 @@
+H - Show/Remove Keyboard Help Command List
+C - Change color of Text and Crosshairs
+
+I - Select input video filename
+O - Select output photo folder
+
+3 - 3D Mode. Save _L and _R frames
+4 - 4V Mode. Save _LL _LM _RM _RR frames for LumePad 3D Tablet
+
+Space     - Next Frame
+Backspace - Previous Frame
+
+L         - Save Frame with suffix _L (mode 3) or _LL (mode 4)
+M         - Save Frame with suffix _LM (mode 4)
+N         - Save Frame with suffix _RM (mode 4)
+R         - Save Frame with suffix _R (mode 3) or _RR (mode 4)
+
+S         - Save Current Display Frame without appending suffix
++         - Advance filename counter
+-         - Reduce filename counter
+
+J         - JPG output 
+P         - PNG output (default)
+
+Mouse click sets crosshairs location at cursor 
+   (do only once per 3d or 4V frame group)
+   (crosshairs set the stereo window for anaglyph)
+   
+For current frame only:
+   Left Arrow  - shift display left 1 pixel
+   Right Arrow - Shift display right 1 pixel
+   Up Arrow    - Shift display up 1 pixel
+   Down Arrow  - Shift display down 1 pixel
+
+A         - Toggle Display current saved 3D frames (_L and _R) as Anaglyph
+X         - Swap Left and Right Images in Anaglyph Display Mode
+
+[         - Reduce crosshair spacing percent of screen width
+]         - Increase crosshair spacing percent of screen width
+
+Enter/Play/Pause  Play frames at 5 frames per second
