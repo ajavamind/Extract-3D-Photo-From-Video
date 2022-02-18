@@ -4,3 +4,6 @@
  Single key commands to use the app are defined in help.txt.
 
 Mouse press displays crosshairs for setting the stereo window. 
+
+[Analog screenshot]{screenshots/screenshot_anaglyph.jpg}
+
