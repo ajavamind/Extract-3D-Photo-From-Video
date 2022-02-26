@@ -130,16 +130,15 @@ void selectVideoFile() {
 }
 
 void selectPhotoOutputFolder() {
-//  if (outputFolderPath == null) {
-    selectFolder("Select Photo Folder", "folderSelected");
-//  } else {
-//    if (DEBUG) println("Save Output Folder: "+ outputFolderPath);
-//    displayMessage("Save Output Folder: "+ outputFolderPath, 60);
-//  }
+  //  if (outputFolderPath == null) {
+  selectFolder("Select Photo Folder", "folderSelected");
+  //  } else {
+  //    if (DEBUG) println("Save Output Folder: "+ outputFolderPath);
+  //    displayMessage("Save Output Folder: "+ outputFolderPath, 60);
+  //  }
 }
 
 void saveConfig(String config) {
-  
 }
 
 String loadConfig()
@@ -150,10 +149,10 @@ String loadConfig()
 void fileSelected(File selection) {
   if (selection == null) {
     if (DEBUG) println("Nothing was selected.");
-    displayMessage("No File selected, using: "+filename, 60);
+    displayMessage("No File selected, using: "+filename, 120);
   } else {
     if (DEBUG) println("User selected " + selection.getAbsolutePath());
-    displayMessage("Video File selected " + selection.getName(), 60);
+    displayMessage("Video File selected " + selection.getName(), 120);
     //displayMessage("Video File selected " + selection.getAbsolutePath(), 60);
     filenamePath = selection.getAbsolutePath();
     filename = selection.getName();
@@ -166,10 +165,10 @@ void fileSelected(File selection) {
 void folderSelected(File selection) {
   if (selection == null) {
     if (DEBUG) println("No Output Folder was selected.");
-    displayMessage("No Output Folder was selected. Using "+ outputFolderPath + " folder", 60);
+    displayMessage("No Output Folder was Selected. Using Folder: "+ outputFolderPath, 120);
   } else {
     if (DEBUG) println("Photo Output Folder selected " + selection.getAbsolutePath());
     outputFolderPath = selection.getAbsolutePath();
-    displayMessage("Photo Output Folder selected " + selection.getAbsolutePath(), 60);
+    displayMessage("Photo Output Folder Selected " + selection.getAbsolutePath(), 120);
   }
 }

@@ -7,7 +7,7 @@
  * Copyright 2022 Andy Modla All Rights Reserved
  * Written in Processing by Andy Modla. 
  * 
- * The app uses keyboard and mouse entry. The keyboard issues commands and the mouse generates
+ * The app uses keyboard and mouse click entry. The keyboard issues commands and the mouse generates
  * a crosshair for marking a fixed position in the scene capture in the video.
  * The crosshair should be place on the foreground subject for more positive parallax,
  * and on middle depth subject for negative parallax of the foreground.
@@ -39,14 +39,28 @@ boolean anaglyph = false;
 boolean newVideo = false;
 boolean leftToRight = true;
 
-static final int MODE_3D = 3;
-static final int MODE_4V = 4;
-int mode = MODE_3D;
+static final int MODE_3D = 1;
+static final int MODE_4V = 2;
+static final int MODE_LENTICULAR = 3;
+int mode = MODE_3D;  // 3D default mode
 
-static final String MODESTR_3D = "3D";
-static final String MODESTR_4V = "4V";
+static final String[] MODE_STR = {"NO MODE", "3D", "4V", "LENTICULAR"};
+String modeString = MODE_STR[mode];
 
-String modeString = MODESTR_3D;
+static final int FRAME_TYPE_LEFT = 0;
+static final int FRAME_TYPE_RIGHT = 1;
+static final int FRAME_TYPE_LEFT_LEFT = 2;
+static final int FRAME_TYPE_LEFT_MIDDLE = 3;
+static final int FRAME_TYPE_RIGHT_MIDDLE = 4;
+static final int FRAME_TYPE_RIGHT_RIGHT = 5;
+static final int FRAME_BASE_LENTICULAR = 6;
+static final int FRAME_MAX_LENTICULAR = 16;
+
+int frameType = FRAME_TYPE_LEFT;
+static final String[] FRAME_TYPE_STR = {
+  "_L", "_R", "_LL", "_LM", "_RM", "_RR", 
+  "_00", "_01", "_02", "_03", "_04", "_05", "_06", "_07", "_08", "_09"
+};
 
 static final String PNG = ".png";
 static final String JPG = ".jpg";
@@ -90,7 +104,12 @@ void setup() {
   background(0);
   TEXT_SIZE = width/80;
   TEXT_SIZE2 = width/120;
-
+  fill(255);
+  textSize(TEXT_SIZE);
+  text("Extract 3D Photo From Video File", 20, 100);
+  text("Copyright 2022 Andy Modla", 20, 130);
+  text("All Rights Reserved", 20, 160);
+  text("Loading Sample 4K Video File", 20, 300);
   openFileSystem();
 
   helpLegend = loadStrings("../help.txt");
@@ -110,6 +129,8 @@ void setup() {
   mov.jump(0);
   mov.pause();
   setFrame(newFrame);
+
+  selectPhotoOutputFolder();
 }
 
 void movieEvent(Movie m) {
@@ -145,25 +166,25 @@ void draw() {
   text("Input: "+filename, 10, 30);
   parallax = leftMouseX - rightMouseX;
   text("Frame: "+newFrame + " / " + (getLength() - 1)+ " offsetX="+offsetX + " offsetY="+offsetY +" parallax="+parallax, 10, 60);
-  
+
   String lr = "Truck Left to Right ";
   if (!leftToRight) lr = "Truck Right to Left ";
-  
   text(lr + "Mode: "+ modeString, 10, 90);
+
   text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 120);
-  text("Output: " +name+"_"+counter+"_"+newFrame +outputFileType, 10, 150);
-  text("Type H for Key Function Legend", 10, 180);
+  text("Output: " +name+"_"+counter+"_"+newFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
+  text(modeString + " Frame Type: "+FRAME_TYPE_STR[frameType], 10, 180);
+  text("Type H for Key Function Legend", 10, 210);
 
   if (showHelp) {
     textSize(TEXT_SIZE2);
     for (int i=0; i< helpLegend.length; i++) {
-      text(helpLegend[i], 10, 240 + i*TEXT_SIZE2);
+      text(helpLegend[i], 10, 270 + i*TEXT_SIZE2);
     }
   } else {
     if (lastMouseX > 0 ) {
       fill(textColor[textColorIndex]);
-      //  drawGrid(0.75);
-      //  drawCrosshair(lastMouseX, lastMouseY);
+      text(FRAME_TYPE_STR[frameType], lastMouseX, lastMouseY);
       drawCrosshairs(lastMouseX, lastMouseY, CROSSHAIR_SPACING_PERCENT);
     }
   }
@@ -191,8 +212,15 @@ void displayMessage(String msg, int counter) {
 }
 
 void savePhoto(String fn) {
-  save(outputFolderPath+File.separator+fn);
-  displayMessage(fn, 20);
+  String lfn = outputFolderPath+File.separator+fn;
+  if (mode == MODE_3D && frameType == FRAME_TYPE_LEFT) {
+    savedLeftFn = name+"_"+counter+"_"+leftFrame+FRAME_TYPE_STR[frameType]+outputFileType;
+  } else {
+    savedRightFn = name+"_"+counter+"_"+rightFrame+FRAME_TYPE_STR[frameType]+outputFileType;
+  }
+
+  save(lfn);
+  displayMessage(lfn, 120);
 }
 
 int counter = 1;

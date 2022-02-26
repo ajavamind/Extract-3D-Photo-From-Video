@@ -4,9 +4,15 @@ String savedRightFn = "";
 String savedAnaglyphFn = "";
 
 PImage makeAnaglyph(boolean anaglyph) {
+  if (DEBUG) println("makeAnaglyph("+anaglyph+")");
   PImage img = null;
   if (anaglyph) {
     if (mode == MODE_3D) {
+      savedLeftFn = outputFolderPath + File.separator+ name+"_"+counter+"_"+
+        leftFrame+FRAME_TYPE_STR[FRAME_TYPE_LEFT]+outputFileType;
+      savedRightFn = outputFolderPath + File.separator+ name+"_"+counter+"_"+
+        rightFrame+FRAME_TYPE_STR[FRAME_TYPE_RIGHT]+outputFileType;
+
       if (leftToRight) {
         img = createAnaglyph(savedLeftFn, savedRightFn);
       } else {
@@ -25,9 +31,17 @@ PImage createAnaglyph(String leftFn, String rightFn) {
   PImage left;
   PImage right;
 
-  left = loadImage(outputFolderPath + File.separator+ leftFn);
-  right = loadImage(outputFolderPath + File.separator+ rightFn);
-  if (left == null || right == null) {
+  left = loadImage(leftFn);
+  right = loadImage(rightFn);
+  if (!(left != null && left.width > 0)) { 
+    displayMessage("Left Image was NOT Saved!", 120);
+    anaglyph = false;
+    parallax = 0;
+    return null;
+  } else if (!(right != null && right.width > 0)) {
+    displayMessage("Right Image was NOT Saved!", 120);
+    anaglyph = false;
+    parallax = 0;
     return null;
   }
   parallax = leftMouseX - rightMouseX;
