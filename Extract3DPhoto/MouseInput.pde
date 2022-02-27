@@ -5,9 +5,16 @@ int leftMouseX = 0;
 int rightMouseX = 0;
 
 int clickNumber = 1;
+boolean firstClick = false; // used to give window focus for key press input
 
 void mousePressed() {
-  lastKey = 0;
-  lastMouseX = mouseX;
-  lastMouseY = mouseY;
+  if (firstClick) {
+    lastKey = 0;
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+  }
+}
+
+void mouseReleased() {
+  firstClick = true;
 }

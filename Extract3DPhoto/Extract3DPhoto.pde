@@ -25,6 +25,8 @@ import select.files.*;
 
 //boolean DEBUG = false;
 boolean DEBUG = true;
+String VERSION = "1.0";
+int Build = 1;
 
 String filename = "sample_whale_grapefruit_juice.mp4";
 String filenamePath;
@@ -39,32 +41,37 @@ boolean anaglyph = false;
 boolean newVideo = false;
 boolean leftToRight = true;
 
+static final int MODE_SINGLE = 0;
 static final int MODE_3D = 1;
 static final int MODE_4V = 2;
 static final int MODE_LENTICULAR = 3;
 int mode = MODE_3D;  // 3D default mode
 
-static final String[] MODE_STR = {"NO MODE", "3D", "4V", "LENTICULAR"};
+static final String[] MODE_STR = {"SINGLE", "3D", "4V", "LENTICULAR"};
 String modeString = MODE_STR[mode];
 
-static final int FRAME_TYPE_LEFT = 0;
-static final int FRAME_TYPE_RIGHT = 1;
-static final int FRAME_TYPE_LEFT_LEFT = 2;
-static final int FRAME_TYPE_LEFT_MIDDLE = 3;
-static final int FRAME_TYPE_RIGHT_MIDDLE = 4;
-static final int FRAME_TYPE_RIGHT_RIGHT = 5;
-static final int FRAME_BASE_LENTICULAR = 6;
-static final int FRAME_MAX_LENTICULAR = 16;
+static final int FRAME_TYPE_SINGLE = 0;
+static final int FRAME_TYPE_LEFT = 1;
+static final int FRAME_TYPE_RIGHT = 2;
+static final int FRAME_TYPE_LEFT_LEFT = 3;
+static final int FRAME_TYPE_LEFT_MIDDLE = 4;
+static final int FRAME_TYPE_RIGHT_MIDDLE = 5;
+static final int FRAME_TYPE_RIGHT_RIGHT = 6;
+static final int FRAME_BASE_LENTICULAR = 7;
+static final int FRAME_MAX_LENTICULAR = 17;
 
 int frameType = FRAME_TYPE_LEFT;
 static final String[] FRAME_TYPE_STR = {
-  "_L", "_R", "_LL", "_LM", "_RM", "_RR", 
+  "", 
+  "_L", "_R", 
+  "_LL", "_LM", "_RM", "_RR", 
   "_00", "_01", "_02", "_03", "_04", "_05", "_06", "_07", "_08", "_09"
 };
 
 static final String PNG = ".png";
 static final String JPG = ".jpg";
-String outputFileType = PNG;
+static final String BMP = ".bmp";
+String outputFileType = JPG;
 
 String message;
 int msgCounter = 0;
@@ -91,6 +98,10 @@ int offsetX = 0;
 int offsetY = 0;
 int parallax = 0;
 
+// counter numbers a group of images single, 3D, 4V, and Lenticular
+// for output filename grouping of the same related images
+int counter = 1;
+
 void settings() {
   //fullScreen(); // full screen is size of output images
   // all 16:9 aspect ratios
@@ -110,6 +121,8 @@ void setup() {
   text("Copyright 2022 Andy Modla", 20, 130);
   text("All Rights Reserved", 20, 160);
   text("Loading Sample 4K Video File", 20, 300);
+
+  text("Do Mouse Click to Start", 20, 360);
   openFileSystem();
 
   helpLegend = loadStrings("../help.txt");
@@ -173,7 +186,7 @@ void draw() {
 
   text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 120);
   text("Output: " +name+"_"+counter+"_"+newFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
-  text(modeString + " Frame Type: "+FRAME_TYPE_STR[frameType], 10, 180);
+  text("Group Counter: "+counter + " "+ modeString + " Frame Type "+FRAME_TYPE_STR[frameType], 10, 180);
   text("Type H for Key Function Legend", 10, 210);
 
   if (showHelp) {
@@ -222,8 +235,6 @@ void savePhoto(String fn) {
   save(lfn);
   displayMessage(lfn, 120);
 }
-
-int counter = 1;
 
 int getFrame() {    
   return ceil(mov.time() * 30) - 1;

@@ -4,6 +4,7 @@ C - Change color of Text and Crosshairs
 I - Select input video filename
 O - Select output photo folder
 
+Y - Single Mode. Save single frame without a suffix
 D - 3D Mode. Save _L and _R frames only
 V - 4V Mode. Save _LL _LM _RM _RR frames for LumePad 3D Tablet
 T - Lenticular Mode. Save frames with suffix _01 to _10 (Not implemented)
@@ -22,10 +23,10 @@ S         - Save Current Display Frame with filename defined by Frame Type
           - Save Frame with suffix _LM (4V mode)
           - Save Frame with suffix _RM (4V mode)
           - Save Frame with suffix _R (3D mode) or _RR (4V mode)
-		  - Save Frame with suffix _00 to _09 (Lenticular mode)
+          - Save Frame with suffix _00 to _09 (Lenticular mode)
 		  
-+         - Advance filename counter
--         - Reduce filename counter
++         - Advance Group filename counter
+-         - Reduce Group filename counter
 
 J         - JPG output 
 P         - PNG output (default)
@@ -42,7 +43,6 @@ For current video frame only:
 
 A         - Toggle Display current saved 3D frames (_L and _R) as Anaglyph
 X         - Swap Left and Right Images in 3D Anaglyph Display Mode
-
 [         - Reduce crosshair spacing percent of screen width
 ]         - Increase crosshair spacing percent of screen width
 

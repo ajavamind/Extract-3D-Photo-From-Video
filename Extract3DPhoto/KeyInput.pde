@@ -162,11 +162,19 @@ boolean keyUpdate() {
     modeString = MODE_STR[mode];
     frameType = FRAME_TYPE_LEFT_LEFT;
     break;
+  case KEYCODE_Y: // set mode to Single
+    mode = MODE_SINGLE;
+    modeString = MODE_STR[mode];
+    frameType = FRAME_TYPE_SINGLE;
+    break;
   case KEYCODE_P:
     outputFileType = PNG;
     break;
   case KEYCODE_J:
     outputFileType = JPG;
+    break;
+  case KEYCODE_B:
+    outputFileType = BMP;
     break;
   case KEYCODE_I:
     selectVideoFile();
@@ -217,7 +225,9 @@ boolean keyUpdate() {
     counter++;
     break;
   case KEYCODE_MINUS:
-    counter--;
+    if (counter > 1) {
+      counter--;
+    }
     break;
   case KEYCODE_LEFT_BRACKET:
     CROSSHAIR_SPACING_PERCENT = CROSSHAIR_SPACING_PERCENT-CROSSHAIR_SPACING_INCREMENT;
