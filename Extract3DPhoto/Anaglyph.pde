@@ -1,22 +1,23 @@
 // Create Anaglyph screen
-String savedLeftFn = "";
-String savedRightFn = "";
-String savedAnaglyphFn = "";
 
 PImage makeAnaglyph(boolean anaglyph) {
   if (DEBUG) println("makeAnaglyph("+anaglyph+")");
   PImage img = null;
   if (anaglyph) {
     if (mode == MODE_3D) {
-      savedLeftFn = outputFolderPath + File.separator+ name+"_"+counter+"_"+
-        leftFrame+FRAME_TYPE_STR[FRAME_TYPE_LEFT]+outputFileType;
-      savedRightFn = outputFolderPath + File.separator+ name+"_"+counter+"_"+
-        rightFrame+FRAME_TYPE_STR[FRAME_TYPE_RIGHT]+outputFileType;
+      //saved3DFn[0] = outputFolderPath + File.separator+ name+"_"+counter+"_"+
+        //leftFrame+FRAME_TYPE_STR[FRAME_TYPE_LEFT]+outputFileType;
+      saved3DFn[0] = outputFolderPath + File.separator+ name+"_"+counter+
+        FRAME_TYPE_STR[FRAME_TYPE_LEFT]+outputFileType;
+      //saved3DFn[1] = outputFolderPath + File.separator+ name+"_"+counter+"_"+
+        //rightFrame+FRAME_TYPE_STR[FRAME_TYPE_RIGHT]+outputFileType;
+      saved3DFn[1] = outputFolderPath + File.separator+ name+"_"+counter+
+        FRAME_TYPE_STR[FRAME_TYPE_RIGHT]+outputFileType;
 
       if (leftToRight) {
-        img = createAnaglyph(savedLeftFn, savedRightFn);
+        img = createAnaglyph(saved3DFn[0], saved3DFn[1]);
       } else {
-        img = createAnaglyph(savedRightFn, savedLeftFn);
+        img = createAnaglyph(saved3DFn[1], saved3DFn[0]);
       }
       if (img == null) {
         anaglyph = false;
@@ -34,12 +35,12 @@ PImage createAnaglyph(String leftFn, String rightFn) {
   left = loadImage(leftFn);
   right = loadImage(rightFn);
   if (!(left != null && left.width > 0)) { 
-    displayMessage("Left Image was NOT Saved!", 120);
+    displayMessage("Left Image was NOT Saved! "+ leftFn, 120);
     anaglyph = false;
     parallax = 0;
     return null;
   } else if (!(right != null && right.width > 0)) {
-    displayMessage("Right Image was NOT Saved!", 120);
+    displayMessage("Right Image was NOT Saved! "+ rightFn, 120);
     anaglyph = false;
     parallax = 0;
     return null;
@@ -72,7 +73,7 @@ private PImage colorAnaglyph(PImage bufL, PImage bufR) {
 private PImage colorAnaglyph(PImage bufL, PImage bufR, int offset) {
   // color anaglyph merge left and right images
   // reuse left image for faster performance
-  if (DEBUG) println("createAnaglyph "+savedLeftFn +"   "+savedRightFn);
+  if (DEBUG) println("createAnaglyph "+saved3DFn[0] +"   "+saved3DFn[1]);
   if (DEBUG) println("parallax="+parallax);
 
   bufL.loadPixels();

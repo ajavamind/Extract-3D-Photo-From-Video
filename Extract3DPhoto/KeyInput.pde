@@ -110,6 +110,7 @@ boolean keyUpdate() {
       offsetX = 0;
       offsetY = 0;
       setFrame(newFrame);
+      frameType = FRAME_TYPE_MISSING;
     }
     break;
   case KEYCODE_SPACE:
@@ -118,19 +119,24 @@ boolean keyUpdate() {
       offsetX = 0;
       offsetY = 0;
       setFrame(newFrame);
+      frameType = FRAME_TYPE_MISSING;
     }
     break;
   case LEFT:
     offsetX--;
+    frameType = FRAME_TYPE_MISSING;
     break;
   case RIGHT:
     offsetX++;
+    frameType = FRAME_TYPE_MISSING;
     break;
   case UP:
     offsetY--;
+    frameType = FRAME_TYPE_MISSING;
     break;
   case DOWN:
     offsetY++;
+    frameType = FRAME_TYPE_MISSING;
     break;
   case KEYCODE_W: // debug output including stereo window parallax offset
     parallax = leftMouseX - rightMouseX;
@@ -150,22 +156,28 @@ boolean keyUpdate() {
   case KEYCODE_9:
     mode = MODE_LENTICULAR;
     modeString = MODE_STR[mode];
-    frameType = FRAME_BASE_LENTICULAR + lastKeyCode - KEYCODE_0;
+    frameType = FRAME_TYPE_BASE_LENTICULAR + lastKeyCode - KEYCODE_0;
     break;
   case KEYCODE_D: // set mode to 3D
     mode = MODE_3D;
     modeString = MODE_STR[mode];
-    frameType = FRAME_TYPE_LEFT;
+    resetSavedFn();
     break;
   case KEYCODE_V: // set mode to 4V for Leia LumePad 3D Tablet
     mode = MODE_4V;
     modeString = MODE_STR[mode];
-    frameType = FRAME_TYPE_LEFT_LEFT;
+    resetSavedFn();
     break;
   case KEYCODE_Y: // set mode to Single
     mode = MODE_SINGLE;
     modeString = MODE_STR[mode];
     frameType = FRAME_TYPE_SINGLE;
+    resetSavedFn();
+    break;
+  case KEYCODE_T: // set mode to Lenticular
+    mode = MODE_LENTICULAR;
+    modeString = MODE_STR[mode];
+    resetSavedFn();
     break;
   case KEYCODE_P:
     outputFileType = PNG;
@@ -184,10 +196,10 @@ boolean keyUpdate() {
     break;
   case KEYCODE_S:
     if (anaglyph) {
-      savedAnaglyphFn = name+"_"+counter+"_L"+leftFrame+"_R"+rightFrame+"_ana"+outputFileType;
-      savePhoto(savedAnaglyphFn);
+      savePhoto(name+"_"+counter+"_L"+leftFrame+"_R"+rightFrame+"_ana"+outputFileType, false);
     } else {
-      savePhoto(name+"_"+counter+"_"+newFrame+FRAME_TYPE_STR[frameType]+outputFileType);
+      //savePhoto(name+"_"+counter+"_"+newFrame+FRAME_TYPE_STR[frameType]+outputFileType, true);
+      savePhoto(name+"_"+counter+FRAME_TYPE_STR[frameType]+outputFileType, true);
     }
     break;
   case KEYCODE_L:
@@ -223,10 +235,12 @@ boolean keyUpdate() {
     break;
   case KEYCODE_PLUS:
     counter++;
+    resetSavedFn();
     break;
   case KEYCODE_MINUS:
     if (counter > 1) {
       counter--;
+      resetSavedFn();
     }
     break;
   case KEYCODE_LEFT_BRACKET:

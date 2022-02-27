@@ -26,7 +26,7 @@ import select.files.*;
 //boolean DEBUG = false;
 boolean DEBUG = true;
 String VERSION = "1.0";
-int Build = 1;
+String BUILD = str(1);
 
 String filename = "sample_whale_grapefruit_juice.mp4";
 String filenamePath;
@@ -47,26 +47,34 @@ static final int MODE_4V = 2;
 static final int MODE_LENTICULAR = 3;
 int mode = MODE_3D;  // 3D default mode
 
+static final int NUM_3D = 2;
+static final int NUM_4V = 4;
+static final int NUM_LENTICULAR = 10;
+
 static final String[] MODE_STR = {"SINGLE", "3D", "4V", "LENTICULAR"};
 String modeString = MODE_STR[mode];
 
-static final int FRAME_TYPE_SINGLE = 0;
-static final int FRAME_TYPE_LEFT = 1;
-static final int FRAME_TYPE_RIGHT = 2;
-static final int FRAME_TYPE_LEFT_LEFT = 3;
-static final int FRAME_TYPE_LEFT_MIDDLE = 4;
-static final int FRAME_TYPE_RIGHT_MIDDLE = 5;
-static final int FRAME_TYPE_RIGHT_RIGHT = 6;
-static final int FRAME_BASE_LENTICULAR = 7;
-static final int FRAME_MAX_LENTICULAR = 17;
+static final int FRAME_TYPE_MISSING = 0;
+static final int FRAME_TYPE_SINGLE = 1;
+static final int FRAME_TYPE_LEFT = 2;
+static final int FRAME_TYPE_RIGHT = 3;
+static final int FRAME_TYPE_LEFT_LEFT = 4;
+static final int FRAME_TYPE_LEFT_MIDDLE = 5;
+static final int FRAME_TYPE_RIGHT_MIDDLE = 6;
+static final int FRAME_TYPE_RIGHT_RIGHT = 7;
+static final int FRAME_TYPE_BASE_LENTICULAR = 8;
+static final int FRAME_TYPE_MAX_LENTICULAR = 18;
 
-int frameType = FRAME_TYPE_LEFT;
-static final String[] FRAME_TYPE_STR = {
+int frameType = FRAME_TYPE_MISSING;  //FRAME_TYPE_LEFT;
+static final String[] FRAME_TYPE_STR = {"", 
   "", 
   "_L", "_R", 
   "_LL", "_LM", "_RM", "_RR", 
   "_00", "_01", "_02", "_03", "_04", "_05", "_06", "_07", "_08", "_09"
 };
+static final String[] FRAME_3D_LABEL = { "Left  ", "Right "};
+static final String[] FRAME_4V_LABEL = { "Left Left   ", "Left Middle", "Right Middle ", "Right Right  "};
+static final String[] FRAME_LENTICULAR_LABEL = { "00 ", "01 ", "02 ", "03 ", "04 ", "05 ", "06 ", "07 ", "08 ", "09 "};
 
 static final String PNG = ".png";
 static final String JPG = ".jpg";
@@ -102,6 +110,31 @@ int parallax = 0;
 // for output filename grouping of the same related images
 int counter = 1;
 
+static final String emptyStr = "";
+String   savedSingleFn = emptyStr;
+String[] saved3DFn = { emptyStr, emptyStr};
+String[] saved4VFn = { emptyStr, emptyStr, emptyStr, emptyStr};
+String[] savedLenticularFn = { emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr};
+String savedAnaglyphFn = emptyStr;
+
+void resetSavedFn() {
+  savedSingleFn = emptyStr;
+  for (int i=0; i<NUM_3D; i++) {
+    saved3DFn[i] = emptyStr;
+  }
+  for (int i=0; i<NUM_4V; i++) {
+    saved4VFn[i] = emptyStr;
+  }
+  for (int i=0; i<NUM_LENTICULAR; i++) {
+    savedLenticularFn[i] = emptyStr;
+  }
+  savedAnaglyphFn = emptyStr;
+  frameType = FRAME_TYPE_MISSING;
+  parallax = 0;
+  offsetX = 0;
+  offsetY = 0;
+}
+
 void settings() {
   //fullScreen(); // full screen is size of output images
   // all 16:9 aspect ratios
@@ -118,8 +151,9 @@ void setup() {
   fill(255);
   textSize(TEXT_SIZE);
   text("Extract 3D Photo From Video File", 20, 100);
-  text("Copyright 2022 Andy Modla", 20, 130);
-  text("All Rights Reserved", 20, 160);
+  text("Version "+VERSION+ " BUILD " + BUILD + " "+ (DEBUG ? "DEBUG" : ""), 20, 130);
+  text("Copyright 2022 Andy Modla", 20, 160);
+  text("All Rights Reserved", 20, 190);
   text("Loading Sample 4K Video File", 20, 300);
 
   text("Do Mouse Click to Start", 20, 360);
@@ -177,7 +211,7 @@ void draw() {
   fill(textColor[textColorIndex]);
   textSize(TEXT_SIZE);
   text("Input: "+filename, 10, 30);
-  parallax = leftMouseX - rightMouseX;
+  //parallax = leftMouseX - rightMouseX;
   text("Frame: "+newFrame + " / " + (getLength() - 1)+ " offsetX="+offsetX + " offsetY="+offsetY +" parallax="+parallax, 10, 60);
 
   String lr = "Truck Left to Right ";
@@ -185,14 +219,32 @@ void draw() {
   text(lr + "Mode: "+ modeString, 10, 90);
 
   text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 120);
-  text("Output: " +name+"_"+counter+"_"+newFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
-  text("Group Counter: "+counter + " "+ modeString + " Frame Type "+FRAME_TYPE_STR[frameType], 10, 180);
-  text("Type H for Key Function Legend", 10, 210);
+  //text("Output: " +name+"_"+counter+"_"+newFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
+  text("Group Counter: "+counter + " "+ modeString + " Frame Type "+FRAME_TYPE_STR[frameType], 10, 150);
+  text("Type H for Key Function Legend", 10, 180);
+  text("Saved Files for Group "+counter+":", 10, 240);
+
+  if (mode == MODE_3D) {
+    for (int i=0; i<NUM_3D; i++) {
+      text(FRAME_3D_LABEL[i]+saved3DFn[i], 10, 270 + i*30);
+    }
+    text("Anaglyph "+savedAnaglyphFn, 10, 270 + 2*30);
+  } else if (mode == MODE_4V) {
+    for (int i=0; i<NUM_4V; i++) {
+      text(FRAME_4V_LABEL[i]+saved4VFn[i], 10, 270 + i*30);
+    }
+  } else if (mode == MODE_LENTICULAR) {
+    for (int i=0; i<NUM_LENTICULAR; i++) {
+      text(FRAME_LENTICULAR_LABEL[i]+savedLenticularFn[i], 10, 270 + i*30);
+    }
+  } else if (mode == MODE_SINGLE) {
+    text("SINGLE "+savedSingleFn, 10, 270 );
+  }
 
   if (showHelp) {
     textSize(TEXT_SIZE2);
     for (int i=0; i< helpLegend.length; i++) {
-      text(helpLegend[i], 10, 270 + i*TEXT_SIZE2);
+      text(helpLegend[i], width/2, 30 + i*TEXT_SIZE2);
     }
   } else {
     if (lastMouseX > 0 ) {
@@ -206,7 +258,7 @@ void draw() {
   if (message != null && msgCounter > 0) {
     //fill(color(128, 32, 128));
     fill(textColor[textColorIndex]);
-    text(message, 60, height/2);
+    text(message, 30, height/2+60);
     msgCounter--;
     if (msgCounter == 0) message = null;
   }
@@ -224,16 +276,31 @@ void displayMessage(String msg, int counter) {
   msgCounter = counter;
 }
 
-void savePhoto(String fn) {
+void savePhoto(String fn, boolean saveName) {
   String lfn = outputFolderPath+File.separator+fn;
-  if (mode == MODE_3D && frameType == FRAME_TYPE_LEFT) {
-    savedLeftFn = name+"_"+counter+"_"+leftFrame+FRAME_TYPE_STR[frameType]+outputFileType;
+  if (saveName) {
+    if (mode == MODE_SINGLE) {
+      savedSingleFn = lfn;
+    }
+    if (frameType ==FRAME_TYPE_MISSING) {
+      displayMessage("Frame Type Not Set", 60);
+      return;
+    }
+
+    if (mode == MODE_3D) {
+      saved3DFn[frameType-FRAME_TYPE_LEFT] = lfn;
+    } else if (mode == MODE_4V) {
+      saved4VFn[frameType - FRAME_TYPE_LEFT_LEFT] = lfn;
+    } else if (mode == MODE_LENTICULAR) {
+      savedLenticularFn[frameType - FRAME_TYPE_BASE_LENTICULAR] = lfn;
+    }
   } else {
-    savedRightFn = name+"_"+counter+"_"+rightFrame+FRAME_TYPE_STR[frameType]+outputFileType;
+    savedAnaglyphFn = lfn;
   }
 
   save(lfn);
-  displayMessage(lfn, 120);
+  if (DEBUG) println("Save Photo: " + lfn);
+  //displayMessage(lfn, 60);
 }
 
 int getFrame() {    
