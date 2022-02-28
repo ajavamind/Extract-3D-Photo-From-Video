@@ -5,7 +5,7 @@ Single key commands control the app operation to extract the left and right eye 
 
 Mouse press displays crosshairs that define a point in a movie frame scene for setting the stereo window. This point should be close to the foreground to reduce negative parallax (scene elements may pop out towards the viewer excessively) in the stereo photo. The cross hair line width helps the user to avoid 3D disparities that exceed 3% of the display width. 3D Images with disparities more than 3% are uncomfortable to view.
 
-A stereo pair extracted from the video can be checked for good 3D viewing by a command that displays the 3D image in anaglyph. If more disparity is needed the right eye photo can be changed and viewed again. 
+A stereo pair extracted from the video can be checked for good 3D viewing by a command that displays the 3D image in anaglyph. If more or less disparity is needed the right eye photo can be changed by going forward or backward one frame at a time, and then view the extracted image pairs again. 
 
 I found that extracting 4V images the disparity between each image should not exceed 1%, even better to have less disparity. This is the reason for default 0.75% spacing in the crosshair grid.
 
