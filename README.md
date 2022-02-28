@@ -1,5 +1,7 @@
 # Extract-3D-Photo-From-Video
-This Java application written in the Processing language assists with manual left and right eye image pair extraction from motion videos that truck left to right. These extracted images form groups of 3D stereo photos, 4V quad stereo photos displayable on a Leia Lumpad glasses free 3D tablet display, and photo collections for creating 3D lenticular images. The motion videos capture static scences of stationary subjects for 3D viewing after image extraction.
+This Java application written in the Processing language assists with manual left and right eye image pair extraction from motion videos that truck left to right. These extracted images form groups of 3D stereo photos, 4V quad stereo photos displayable on a Leia Lumpad glasses free 3D tablet display, and photo collections for creating 3D lenticular images. 
+
+The motion videos capture static scences of stationary subjects for 3D viewing after image extraction. The motion video technique generates multiple sequential image captures of left and right views without determining precise camera interaxial distances for the best stereo image capture based on the camera distance from the subject and background.
  
 Single key commands control the app operation to extract the left and right eye view photos. These commands are defined in help.txt. There is no graphical user interface at the moment.
 
