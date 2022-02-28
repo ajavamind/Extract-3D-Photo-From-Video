@@ -9,7 +9,7 @@ A stereo pair extracted from the video can be checked for good 3D viewing by a c
 
 I found that extracting 4V images the disparity between each image should not exceed 1%, even better to have less disparity. This is the reason for default 0.75% spacing in the crosshair grid.
 
-Currently the size of the extracted saved photos is the size of the display the application runs on. A size(width, height) window or full screen can be defined in the app setup() function.
+Currently the size of the extracted saved photos is the size of the display window the application runs on. A specified size(width, height) window or full screen can be defined in the application's settings() function.
 
 So far I have experimented with mp4 video files with resolutions of 1920x1080, 3840x2160 (4K), and 7680x4320 (8K) pixels. The 8K video files are noticibly slow reads on my computer. The source of the videos are my Samsung phone and DSLR camera.
 
