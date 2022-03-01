@@ -1,5 +1,5 @@
 # Extract-3D-Photo-From-Video
-This Java application written in the Processing language assists with manual left and right eye image pair extraction from motion videos that truck left to right. These extracted images form groups of 3D stereo photos, 4V quad stereo photos displayable on a Leia Lumpad glasses free 3D tablet display, and photo collections for creating 3D lenticular images. 
+This Java application written in the Processing language assists with ___manual extraction___ of left and right eye image pairs from motion videos that truck left to right. Multiple groups of extracted images can be saved for 3D stereo photos, 4V quad stereo photos displayable on a Leia Lumpad glasses free 3D tablet display, and photo collections for creating 3D lenticular images. 
 
 The motion videos capture static scences of stationary subjects for 3D viewing after image extraction. The motion video technique generates multiple sequential image captures of left and right views without determining precise camera interaxial distances for the best stereo image capture based on the camera distance from the subject and background.
  
@@ -23,4 +23,20 @@ When you compile and run the Extract 3D Photo application in the Processing SDK 
 ## Screenshot
 
 ![Analog screenshot](screenshots/screenshot_anaglyph.jpg)
+
+## Manual Extraction Tools
+Other tools:
+
+## Automated Tools
+These automated tools may be of interest:
+
+### Automated Left/Right Frame Extraction Script in Python
+[3D Videos 2 Stereo](https://github.com/lasinger/3DVideos2Stereo)
+
+Code for automated depth maps:
+
+[MiDaS](https://github.com/isl-org/MiDaS)
+
+[Youtube demonstration of automated depth map extraction from video](https://www.youtube.com/watch?v=D46FzVyL9I8)
+
 
