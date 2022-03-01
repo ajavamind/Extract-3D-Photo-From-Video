@@ -39,4 +39,8 @@ Code for automated depth maps:
 
 [Youtube demonstration of automated depth map extraction from video](https://www.youtube.com/watch?v=D46FzVyL9I8)
 
+### Semi-automatic Stereo Extraction from Video Footage
+
+[Stereo Conversion PDF paper](https://www.cs.tau.ac.il/~wolf/papers/stereoconversion_web.pdf)
+
 
