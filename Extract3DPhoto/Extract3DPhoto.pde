@@ -17,14 +17,14 @@
  * It estimates the frame counts using the framerate
  * of the movie file, so it might not be exact in some cases.
  
- * Key commands sSaves left and right eye frames for a stereo image.
+ * Key commands saves left and right eye frames for a stereo image.
  */
 
 import processing.video.*;
 import select.files.*;
 
-//boolean DEBUG = false;
-boolean DEBUG = true;
+boolean DEBUG = false;
+//boolean DEBUG = true;
 String VERSION = "1.0";
 String BUILD = str(1);
 
@@ -77,9 +77,10 @@ static final String[] FRAME_4V_LABEL = { "Left Left   ", "Left Middle", "Right M
 static final String[] FRAME_LENTICULAR_LABEL = { "00 ", "01 ", "02 ", "03 ", "04 ", "05 ", "06 ", "07 ", "08 ", "09 "};
 
 static final String PNG = ".png";
-static final String JPG = ".jpg";
+static final String JPEG = ".jpg";
 static final String BMP = ".bmp";
-String outputFileType = JPG;
+static final String TIFF = ".tif";
+String outputFileType = JPEG;
 
 String message;
 int msgCounter = 0;
@@ -190,7 +191,7 @@ void draw() {
     mov.stop();
     mov.dispose();
     newFrame = 1;
-    name = filename.substring(0, filename.indexOf(".mp4"));
+    name = filename.substring(0, filename.toLowerCase().indexOf(".mp4"));
     mov = new Movie(this, filenamePath);
 
     // Pausing the video at the first frame. 
@@ -354,21 +355,23 @@ void drawGrid(float percent) {
 }
 
 void drawCrosshairs(float x, float y, float percent) {
+  int MIDHORZ = 6;
   float s = (percent * width)/100.0;
   stroke(crosshairColor[textColorIndex]);
   line(lastMouseX-3*CROSSHAIR_SIZE, lastMouseY, lastMouseX+3*CROSSHAIR_SIZE, lastMouseY);
-  for (int d = 0; d < 11; d++) {
-    if (d == 5 ) {
+  for (int d = 0; d < (2*MIDHORZ+1); d++) {
+    if (d == MIDHORZ ) {
       stroke(crosshairColor[textColorIndex]);
     } else {
       stroke(textColor[textColorIndex]);
     }
-    line(x+(float(d)-5)*s, y-2*CROSSHAIR_SIZE, x+(float(d)-5)*s, y+2*CROSSHAIR_SIZE);
+    line(x+(float(d)-MIDHORZ)*s, y-2*CROSSHAIR_SIZE, x+(float(d)-MIDHORZ)*s, y+2*CROSSHAIR_SIZE);
   }
+  drawCrosshair(saveMouseX, saveMouseY);
 }
 
 void drawCrosshair(float x, float y) {
-  stroke(crosshairColor[textColorIndex]);
-  line(x-CROSSHAIR_SIZE, y, x+CROSSHAIR_SIZE, y);
-  line(x, y-CROSSHAIR_SIZE, x, y+CROSSHAIR_SIZE);
+ stroke(crosshairColor[textColorIndex]);
+  line(x, 0, x, height);
+  line(0, y, width, y);
 }

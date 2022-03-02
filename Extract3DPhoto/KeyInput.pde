@@ -183,10 +183,13 @@ boolean keyUpdate() {
     outputFileType = PNG;
     break;
   case KEYCODE_J:
-    outputFileType = JPG;
+    outputFileType = JPEG;
     break;
   case KEYCODE_B:
     outputFileType = BMP;
+    break;
+  case KEYCODE_F:
+    outputFileType = TIFF;
     break;
   case KEYCODE_I:
     selectVideoFile();
@@ -201,6 +204,10 @@ boolean keyUpdate() {
       //savePhoto(name+"_"+counter+"_"+newFrame+FRAME_TYPE_STR[frameType]+outputFileType, true);
       savePhoto(name+"_"+counter+FRAME_TYPE_STR[frameType]+outputFileType, true);
     }
+    break;
+  case KEYCODE_G:
+    saveMouseX = lastMouseX;
+    saveMouseY = lastMouseY;
     break;
   case KEYCODE_L:
     if (mode == MODE_3D) {

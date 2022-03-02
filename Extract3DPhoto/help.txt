@@ -6,17 +6,18 @@ O - Select output photo folder
 
 Y - Single Mode. Save single frame without a suffix
 D - 3D Mode. Save _L and _R frames only
-V - 4V Mode. Save _LL _LM _RM _RR frames for LumePad 3D Tablet
-T - Lenticular Mode. Save frames with suffix _01 to _10 (Not implemented)
+V - 4V Mode. Save suffix _LL _LM _RM _RR frames for LumePad 3D Tablet
+T - Lenticular Mode. Save frames with suffix _00 to _09
 
 Space     - Next Video Frame
 Backspace - Previous Video Frame
+G         - Save current crosshair location marking same feature on frames
 
 L         - Set Frame Type as _L (3D mode) or _LL (4V mode)
 M         - Set Frame Type as _LM (4V mode)
 N         - Set Frame Type as _RM (4V mode)
 R         - Set Frame Type as _R (3D mode) or _RR (4V mode)
-0-9       - Set Frame Type as Lenticular _00 to _09 (Lenticular mode)
+0-9       - Set Lenticular Frame Number suffix _00 to _09 (Lenticular mode)
 
 S         - Save Current Display Frame with filename defined by Frame Type
           - Save Frame with suffix _L (3D mode) or _LL (4V mode)
@@ -28,8 +29,10 @@ S         - Save Current Display Frame with filename defined by Frame Type
 +         - Advance Group filename counter
 -         - Reduce Group filename counter
 
-J         - JPG output 
-P         - PNG output (default)
+J         - JPG file type output (default)
+P         - PNG file type output 
+B         - BMP file type output
+F         - TIF file type output
 
 Mouse click sets crosshairs location at cursor 
    (do only once per 3d or 4V frame group)

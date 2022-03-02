@@ -1,7 +1,7 @@
 // Create Anaglyph screen
 
 PImage makeAnaglyph(boolean anaglyph) {
-  if (DEBUG) println("makeAnaglyph("+anaglyph+")");
+  if (DEBUG) println("makeAnaglyph("+anaglyph+") "+MODE_STR[mode]);
   PImage img = null;
   if (anaglyph) {
     if (mode == MODE_3D) {
@@ -20,6 +20,7 @@ PImage makeAnaglyph(boolean anaglyph) {
         img = createAnaglyph(saved3DFn[1], saved3DFn[0]);
       }
       if (img == null) {
+        if (DEBUG) println("Could not create anaglyph "+saved3DFn[0]+" "+saved3DFn[1]);
         anaglyph = false;
       }
     }
