@@ -20,7 +20,7 @@ Press "S" key to save the frame in the output folder.
 Note: Subjects behind the stereo window have positive parallax, subjects in front of the window have negative parallax.
 
 4. Now advance video frames (space bar) to find a suitable right eye view frame. The crosshair spacing is a percentage of the display window width.
-The frame used should be less than 3% of the window width. 
+The frame used should have a feature displacement of less than 3% of the window width. 
 After selecting the right eye frame, use the right arrow key to move the frame so that the two vertical crosshair patterns match.
 Press the "R" key to label the frame as right eye. Now if the feature position does not line up vertically with the feature crosshair, use the
 up/down arrow keys to position the horizontal crosshairs on the same plane. Press the "S" key to save the right eye frame in the output folder. 
