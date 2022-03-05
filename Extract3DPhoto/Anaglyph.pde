@@ -5,15 +5,6 @@ PImage makeAnaglyph(boolean anaglyph) {
   PImage img = null;
   if (anaglyph) {
     if (mode == MODE_3D) {
-      //saved3DFn[0] = outputFolderPath + File.separator+ name+"_"+counter+"_"+
-        //leftFrame+FRAME_TYPE_STR[FRAME_TYPE_LEFT]+outputFileType;
-      saved3DFn[0] = outputFolderPath + File.separator+ name+"_"+counter+
-        FRAME_TYPE_STR[FRAME_TYPE_LEFT]+outputFileType;
-      //saved3DFn[1] = outputFolderPath + File.separator+ name+"_"+counter+"_"+
-        //rightFrame+FRAME_TYPE_STR[FRAME_TYPE_RIGHT]+outputFileType;
-      saved3DFn[1] = outputFolderPath + File.separator+ name+"_"+counter+
-        FRAME_TYPE_STR[FRAME_TYPE_RIGHT]+outputFileType;
-
       if (leftToRight) {
         img = createAnaglyph(saved3DFn[0], saved3DFn[1]);
       } else {

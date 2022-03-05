@@ -14,8 +14,8 @@
  * The app moves through the video one frame at the time using the
  * space and backspace keys. 
  
- * It estimates the frame counts using the framerate
- * of the movie file, so it might not be exact in some cases.
+ * The video frame read technique estimates the frame number using the framerate
+ * of the movie file, so it might not be exact for every frame.
  
  * Key commands saves left and right eye frames for a stereo image.
  */
@@ -88,7 +88,7 @@ int msgCounter = 0;
 Movie mov;
 int leftFrame = 1;
 int rightFrame = 1;
-int newFrame = 1;
+int currentFrame = 1;
 int TEXT_SIZE;  // in pixels
 int TEXT_SIZE2;  // in pixels
 
@@ -151,6 +151,7 @@ void setup() {
   TEXT_SIZE2 = width/120;
   fill(255);
   textSize(TEXT_SIZE);
+  surface.setTitle("Extract 3D Photo From Video File");
   text("Extract 3D Photo From Video File", 20, 100);
   text("Version "+VERSION+ " BUILD " + BUILD + " "+ (DEBUG ? "DEBUG" : ""), 20, 130);
   text("Copyright 2022 Andy Modla", 20, 160);
@@ -173,10 +174,7 @@ void setup() {
   mov = new Movie(this, filename);
 
   // Pausing the video at the first frame. 
-  mov.play();
-  mov.jump(0);
-  mov.pause();
-  setFrame(newFrame);
+  rewind(1);
 
   selectPhotoOutputFolder();
 }
@@ -185,20 +183,24 @@ void movieEvent(Movie m) {
   m.read();
 }
 
+void rewind(int frameNo) {
+  currentFrame = frameNo;
+  mov.play();
+  mov.jump(0);
+  mov.pause();
+  setFrame(currentFrame);
+}
+
 void draw() {
   if (newVideo) {
     newVideo = false;
     mov.stop();
     mov.dispose();
-    newFrame = 1;
-    name = filename.substring(0, filename.toLowerCase().indexOf(".mp4"));
+    name = filename.substring(0, filename.toLowerCase().lastIndexOf("."));
     mov = new Movie(this, filenamePath);
 
     // Pausing the video at the first frame. 
-    mov.play();
-    mov.jump(0);
-    mov.pause();
-    setFrame(newFrame);
+    rewind(1);
   }
 
   background(0);
@@ -211,18 +213,19 @@ void draw() {
 
   fill(textColor[textColorIndex]);
   textSize(TEXT_SIZE);
-  text("Input: "+filename, 10, 30);
+  text("Input: "+filename + " width="+mov.width+" height="+mov.height+" "+mov.frameRate+" FPS", 10, 30);
   //parallax = leftMouseX - rightMouseX;
-  text("Frame: "+newFrame + " / " + (getLength() - 1)+ " offsetX="+offsetX + " offsetY="+offsetY +" parallax="+parallax, 10, 60);
+  text("Output Folder: "+outputFolderPath, 10, 60);
+  text("Frame: "+currentFrame + " / " + (getLength() - 1)+ " offsetX="+offsetX + " offsetY="+offsetY, 10, 90);
 
   String lr = "Truck Left to Right ";
   if (!leftToRight) lr = "Truck Right to Left ";
-  text(lr + "Mode: "+ modeString, 10, 90);
+  text(lr + "Mode: "+ modeString, 10, 120);
 
-  text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 120);
-  //text("Output: " +name+"_"+counter+"_"+newFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
-  text("Group Counter: "+counter + " "+ modeString + " Frame Type "+FRAME_TYPE_STR[frameType], 10, 150);
-  text("Type H for Key Function Legend", 10, 180);
+  text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 150);
+  //text("Output: " +name+"_"+counter+"_"+currentFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
+  text("Group Counter: "+counter + " Frame Type "+FRAME_TYPE_STR[frameType], 10, 180);
+  text("Type H for Key Function Legend", 10, 210);
   text("Saved Files for Group "+counter+":", 10, 240);
 
   if (mode == MODE_3D) {
@@ -277,8 +280,8 @@ void displayMessage(String msg, int counter) {
   msgCounter = counter;
 }
 
-void savePhoto(String fn, boolean saveName) {
-  String lfn = outputFolderPath+File.separator+fn;
+void savePhoto(String fn, String prefix, boolean saveName, boolean highRes) {
+  String lfn = outputFolderPath+File.separator+prefix+fn;
   if (saveName) {
     if (mode == MODE_SINGLE) {
       savedSingleFn = lfn;
@@ -295,11 +298,19 @@ void savePhoto(String fn, boolean saveName) {
     } else if (mode == MODE_LENTICULAR) {
       savedLenticularFn[frameType - FRAME_TYPE_BASE_LENTICULAR] = lfn;
     }
+    save(lfn);
   } else {
-    savedAnaglyphFn = lfn;
+    if (highRes) {
+      // highest resolution but NO shift vertical or horizontal for alignment of stereo window
+      PImage tmp = mov.copy();
+      tmp.save(lfn);
+      displayMessage("Saved original resolution: "+lfn, 30);
+    } else {
+      savedAnaglyphFn = lfn;
+      save(lfn);
+    }
   }
 
-  save(lfn);
   if (DEBUG) println("Save Photo: " + lfn);
   //displayMessage(lfn, 60);
 }
@@ -309,6 +320,7 @@ int getFrame() {
 }
 
 void setFrame(int n) {
+  if (DEBUG) println("setFrame("+n+")");
   mov.play();
 
   // The duration of a single frame:
@@ -325,7 +337,8 @@ void setFrame(int n) {
 
   mov.jump(where);
   mov.pause();
-  if (DEBUG) println("setFrame("+n+")");
+  mov.play();
+  mov.pause();
 }  
 
 int getLength() {
@@ -336,7 +349,7 @@ void play() {
   mov.speed(0.1);
   if (mov.isPlaying()) {
     mov.pause();
-    newFrame = getFrame();
+    currentFrame = getFrame();
   } else {
     mov.play();
   }
@@ -371,7 +384,8 @@ void drawCrosshairs(float x, float y, float percent) {
 }
 
 void drawCrosshair(float x, float y) {
- stroke(crosshairColor[textColorIndex]);
+  if (x == 0 && y == 0) return;
+  stroke(crosshairColor[textColorIndex]);
   line(x, 0, x, height);
   line(0, y, width, y);
 }

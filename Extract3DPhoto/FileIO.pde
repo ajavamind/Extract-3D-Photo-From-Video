@@ -3,7 +3,7 @@
 // Important Comment out the platform not used in the build
 // */
 
-//// Android Platform Build Mode
+//// Android Platform Build Mode NOT IMPLEMENTED
 //final static boolean ANDROID_MODE = true;
 //import android.content.SharedPreferences;
 //import android.preference.PreferenceManager;
@@ -131,7 +131,7 @@ void selectVideoFile() {
 
 void selectPhotoOutputFolder() {
   //  if (outputFolderPath == null) {
-  selectFolder("Select Photo Folder", "folderSelected");
+  selectFolder("Select Output Photo Folder", "folderSelected");
   //  } else {
   //    if (DEBUG) println("Save Output Folder: "+ outputFolderPath);
   //    displayMessage("Save Output Folder: "+ outputFolderPath, 60);
@@ -149,10 +149,10 @@ String loadConfig()
 void fileSelected(File selection) {
   if (selection == null) {
     if (DEBUG) println("Nothing was selected.");
-    displayMessage("No File selected, using: "+filename, 120);
+    displayMessage("No File Selected, Using: "+filename, 60);
   } else {
     if (DEBUG) println("User selected " + selection.getAbsolutePath());
-    displayMessage("Video File selected " + selection.getName(), 120);
+    displayMessage("Video File selected " + selection.getName(), 60);
     //displayMessage("Video File selected " + selection.getAbsolutePath(), 60);
     filenamePath = selection.getAbsolutePath();
     filename = selection.getName();
@@ -164,11 +164,11 @@ void fileSelected(File selection) {
 
 void folderSelected(File selection) {
   if (selection == null) {
-    if (DEBUG) println("No Output Folder was selected.");
-    displayMessage("No Output Folder was Selected. Using Folder: "+ outputFolderPath, 120);
+    if (DEBUG) println("No Output Folder Selected.");
+    displayMessage("No Output Folder Selected. Using Folder: "+ outputFolderPath, 60);
   } else {
     if (DEBUG) println("Photo Output Folder selected " + selection.getAbsolutePath());
     outputFolderPath = selection.getAbsolutePath();
-    displayMessage("Photo Output Folder Selected " + selection.getAbsolutePath(), 120);
+    displayMessage("Photo Output Folder Selected " + selection.getAbsolutePath(), 60);
   }
 }

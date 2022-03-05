@@ -1,3 +1,5 @@
+// Mouse input handling
+
 int lastMouseX = 0;
 int lastMouseY = 0;
 

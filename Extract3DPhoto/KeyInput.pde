@@ -1,9 +1,13 @@
-// Keyboard and mouse input handling
+// Keyboard input handling
+// These codes (ASCII) are for Java applications
+// Android codes (not implemented) differ with some keys
 
 static final int KEYCODE_BACKSPACE = 8;
+static final int KEYCODE_TAB = 9;
 static final int KEYCODE_ENTER = 10;
 static final int KEYCODE_ESCAPE = 27;
 static final int KEYCODE_SPACE = 32;
+static final int KEYCODE_MINUS = 45;
 static final int KEYCODE_0 = 48;
 static final int KEYCODE_1 = 49;
 static final int KEYCODE_2 = 50;
@@ -14,8 +18,8 @@ static final int KEYCODE_6 = 54;
 static final int KEYCODE_7 = 55;
 static final int KEYCODE_8 = 56;
 static final int KEYCODE_9 = 57;
-static final int KEYCODE_MINUS = 45;
 static final int KEYCODE_PLUS = 61;
+
 static final int KEYCODE_A = 65;
 static final int KEYCODE_B = 66;
 static final int KEYCODE_C = 67;
@@ -105,22 +109,36 @@ boolean keyUpdate() {
 
   switch (lastKeyCode) {
   case KEYCODE_BACKSPACE:
-    if (0 < newFrame) {
-      newFrame--;
+    if (currentFrame > 0 ) {
+      currentFrame--;
       offsetX = 0;
       offsetY = 0;
-      setFrame(newFrame);
+      setFrame(currentFrame);
       frameType = FRAME_TYPE_MISSING;
     }
     break;
   case KEYCODE_SPACE:
-    if (newFrame < getLength() - 1) {
-      newFrame++;
+    if (currentFrame < getLength() - 1) {
+      currentFrame++;
       offsetX = 0;
       offsetY = 0;
-      setFrame(newFrame);
+      setFrame(currentFrame);
       frameType = FRAME_TYPE_MISSING;
     }
+    break;
+  case KEYCODE_Z:
+    currentFrame = 1;
+    offsetX = 0;
+    offsetY = 0;
+    setFrame(currentFrame);
+    frameType = FRAME_TYPE_MISSING;
+    break;
+  case KEYCODE_TAB:
+    currentFrame += 10;
+    offsetX = 0;
+    offsetY = 0;
+    setFrame(currentFrame);
+    frameType = FRAME_TYPE_MISSING;
     break;
   case LEFT:
     offsetX--;
@@ -198,11 +216,15 @@ boolean keyUpdate() {
     selectPhotoOutputFolder();
     break;
   case KEYCODE_S:
+  case KEYCODE_K:
     if (anaglyph) {
-      savePhoto(name+"_"+counter+"_L"+leftFrame+"_R"+rightFrame+"_ana"+outputFileType, false);
+      savePhoto(name+"_"+counter+"_"+leftFrame+"L"+rightFrame+"R"+"_ana"+outputFileType, "", false, false);
     } else {
-      //savePhoto(name+"_"+counter+"_"+newFrame+FRAME_TYPE_STR[frameType]+outputFileType, true);
-      savePhoto(name+"_"+counter+FRAME_TYPE_STR[frameType]+outputFileType, true);
+      if (lastKeyCode == KEYCODE_K) {
+        savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "F", false, true);
+      } else {
+        savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+      }
     }
     break;
   case KEYCODE_G:
@@ -212,7 +234,7 @@ boolean keyUpdate() {
   case KEYCODE_L:
     if (mode == MODE_3D) {
       frameType = FRAME_TYPE_LEFT;
-      leftFrame = newFrame;
+      leftFrame = currentFrame;
       leftMouseX = lastMouseX;
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_LEFT_LEFT;
@@ -231,7 +253,7 @@ boolean keyUpdate() {
   case KEYCODE_R:
     if (mode == MODE_3D) {
       frameType = FRAME_TYPE_RIGHT;
-      rightFrame = newFrame;
+      rightFrame = currentFrame;
       rightMouseX = lastMouseX;
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_RIGHT_RIGHT;
