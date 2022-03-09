@@ -16,23 +16,24 @@ Backspace - Previous Video Frame
 
 Mouse click sets crosshair at cursor location 
    
-G         - Save current crosshair location marking same feature on frames
-             Used for setting where the stereo window starts in the frame
 Z         - Rewind video
 TAB       - Jump 10 frames ahead
 
-L         - Set Frame Type as _L (3D mode) or _LL (4V mode)
-M         - Set Frame Type as _LM (4V mode)
-N         - Set Frame Type as _RM (4V mode)
-R         - Set Frame Type as _R (3D mode) or _RR (4V mode)
+L         - Set Left Frame as _L (3D mode) or _LL (4V mode)
+          - Saves current crosshair location marking same feature on frames
+            and Identifies a point on a stereo window when all frames aligned on this point
+M         - Set Frame as _LM (4V mode)
+N         - Set Frame as _RM (4V mode)
+R         - Set Right Frame as _R (3D mode) or _RR (4V mode)
 0-9       - Set Lenticular Frame Number suffix _00 to _09 (Lenticular mode)
-
-S         - Save Current Display Frame with filename defined by Frame Type
-          - Save Frame with suffix _L (3D mode) or _LL (4V mode)
-          - Save Frame with suffix _LM (4V mode)
-          - Save Frame with suffix _RM (4V mode)
-          - Save Frame with suffix _R (3D mode) or _RR (4V mode)
-          - Save Frame with suffix _00 to _09 (Lenticular mode)
+            Commands L,M,N,R,0-9 save frame in a file
+          - Left Frame with suffix _L (3D mode) or _LL (4V mode)
+          - Left Middle Frame with suffix _LM (4V mode)
+          - Right Middle Frame with suffix _RM (4V mode)
+          - Right Frame with suffix _R (3D mode) or _RR (4V mode)
+          - Lenticular Frame with suffix _00 to _09 (Lenticular mode)
+		  
+S         - Saves Anaglyph Screen		  
 K         - Save Frame at same resolution as video without offsets
 		  
 +         - Advance Group filename counter

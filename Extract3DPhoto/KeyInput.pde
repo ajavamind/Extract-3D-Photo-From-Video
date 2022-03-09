@@ -94,12 +94,28 @@ boolean keyUpdate() {
   }
   if (anaglyph) {
     if (lastKeyCode == KEYCODE_S) {
+      savePhoto(name+"_"+counter+"_"+leftFrame+"L"+rightFrame+"R"+"_ana"+outputFileType, "", false, false);
+      lastKey = 0;
+      lastKeyCode = 0;
+      return true;
     } else if (lastKeyCode == KEYCODE_X) {
       leftToRight = ! leftToRight;
       screen = makeAnaglyph(true);
       lastKey = 0;
       lastKeyCode = 0;
       return true;
+    //} else if (lastKeyCode == LEFT) {
+    //  offsetX--;
+    //  screen = makeAnaglyph(anaglyph);
+    //} else if (lastKeyCode == RIGHT) {
+    //  offsetX++;
+    //  screen = makeAnaglyph(anaglyph);
+    //} else if (lastKeyCode == UP) {
+    //  offsetY--;
+    //  screen = makeAnaglyph(anaglyph);
+    //} else if (lastKeyCode == DOWN) {
+    //  offsetY++;
+    //  screen = makeAnaglyph(anaglyph);
     } else {
       lastKey = 0;
       lastKeyCode = 0;
@@ -132,6 +148,8 @@ boolean keyUpdate() {
     offsetY = 0;
     setFrame(currentFrame);
     frameType = FRAME_TYPE_MISSING;
+    lastMouseX = 0;
+    lastMouseY = 0;
     break;
   case KEYCODE_TAB:
     currentFrame += 10;
@@ -142,25 +160,26 @@ boolean keyUpdate() {
     break;
   case LEFT:
     offsetX--;
-    frameType = FRAME_TYPE_MISSING;
+    //frameType = FRAME_TYPE_MISSING;
     break;
   case RIGHT:
     offsetX++;
-    frameType = FRAME_TYPE_MISSING;
+    //frameType = FRAME_TYPE_MISSING;
     break;
   case UP:
     offsetY--;
-    frameType = FRAME_TYPE_MISSING;
+    //frameType = FRAME_TYPE_MISSING;
     break;
   case DOWN:
     offsetY++;
-    frameType = FRAME_TYPE_MISSING;
+    //frameType = FRAME_TYPE_MISSING;
     break;
   case KEYCODE_W: // debug output including stereo window parallax offset
-    parallax = leftMouseX - rightMouseX;
-    if (DEBUG) println("lastMouseX="+lastMouseX);
-    if (DEBUG) println("leftMouseX="+leftMouseX + " rightMouseX="+rightMouseX);
+    parallax = saveMouseX - rightMouseX;
     if (DEBUG) println("anaglyph=" + anaglyph +" parallax="+parallax);
+    if (DEBUG) println("lastMouseX="+lastMouseX+" lastMouseY="+lastMouseY);
+    if (DEBUG) println("leftMouseX="+leftMouseX + " rightMouseX="+rightMouseX);
+    if (DEBUG) println("saveMouseX="+saveMouseX + " saveMouseY="+saveMouseY);
     break;
   case KEYCODE_0:
   case KEYCODE_1:
@@ -172,9 +191,13 @@ boolean keyUpdate() {
   case KEYCODE_7:
   case KEYCODE_8:
   case KEYCODE_9:
-    mode = MODE_LENTICULAR;
-    modeString = MODE_STR[mode];
-    frameType = FRAME_TYPE_BASE_LENTICULAR + lastKeyCode - KEYCODE_0;
+    if (mode == MODE_LENTICULAR) {
+      modeString = MODE_STR[mode];
+      frameType = FRAME_TYPE_BASE_LENTICULAR + lastKeyCode - KEYCODE_0;
+      savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+    } else {
+      displayMessage("Not Lenticular Mode.", 30);
+    }
     break;
   case KEYCODE_D: // set mode to 3D
     mode = MODE_3D;
@@ -215,22 +238,19 @@ boolean keyUpdate() {
   case KEYCODE_O:
     selectPhotoOutputFolder();
     break;
-  case KEYCODE_S:
   case KEYCODE_K:
-    if (anaglyph) {
-      savePhoto(name+"_"+counter+"_"+leftFrame+"L"+rightFrame+"R"+"_ana"+outputFileType, "", false, false);
-    } else {
-      if (lastKeyCode == KEYCODE_K) {
-        savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "F", false, true);
-      } else {
-        savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
-      }
-    }
+    savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "F", false, true);
     break;
-  case KEYCODE_G:
-    saveMouseX = lastMouseX;
-    saveMouseY = lastMouseY;
+  case KEYCODE_Q:  // TODO
+    println("launch makeSBS.bat");
+    //launch(sketchPath("")+"makeSBS.bat");
+    exec(".\\makeSBS.bat");
     break;
+    //case KEYCODE_G:
+    //  saveMouseX = lastMouseX;
+    //  saveMouseY = lastMouseY;
+    //  saveFrameType = frameType;
+    //  break;
   case KEYCODE_L:
     if (mode == MODE_3D) {
       frameType = FRAME_TYPE_LEFT;
@@ -239,15 +259,28 @@ boolean keyUpdate() {
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_LEFT_LEFT;
     }
+    saveMouseX = lastMouseX;
+    saveMouseY = lastMouseY;
+    saveFrameType = frameType;
+    savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     break;
+    //case KEYCODE_S:
+    //  if (anaglyph) {
+    //    savePhoto(name+"_"+counter+"_"+leftFrame+"L"+rightFrame+"R"+"_ana"+outputFileType, "", false, false);
+    //  } else {
+    //    savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+    //  }
+    //  break;
   case KEYCODE_M:
     if (mode == MODE_4V) {
       frameType = FRAME_TYPE_LEFT_MIDDLE;
+      savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
     break;
   case KEYCODE_N:
     if (mode == MODE_4V) {
       frameType = FRAME_TYPE_RIGHT_MIDDLE;
+      savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
     break;
   case KEYCODE_R:
@@ -258,6 +291,7 @@ boolean keyUpdate() {
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_RIGHT_RIGHT;
     }
+    savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     break;
   case KEYCODE_H:
     showHelp = !showHelp;

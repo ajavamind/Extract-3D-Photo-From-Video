@@ -23,12 +23,13 @@
 import processing.video.*;
 import select.files.*;
 
-boolean DEBUG = false;
-//boolean DEBUG = true;
+//boolean DEBUG = false;
+boolean DEBUG = true;
 String VERSION = "1.0";
 String BUILD = str(1);
 
-String filename = "sample_whale_grapefruit_juice.mp4";
+String filename = "sample_whale_grapefruit_juice_noaudio.mp4";
+//String filename ="http://";  // TODO
 String filenamePath;
 String name;
 
@@ -73,7 +74,7 @@ static final String[] FRAME_TYPE_STR = {"",
   "_00", "_01", "_02", "_03", "_04", "_05", "_06", "_07", "_08", "_09"
 };
 static final String[] FRAME_3D_LABEL = { "Left  ", "Right "};
-static final String[] FRAME_4V_LABEL = { "Left Left   ", "Left Middle", "Right Middle ", "Right Right  "};
+static final String[] FRAME_4V_LABEL = { "Left Left   ", "Left Middle ", "Right Middle ", "Right Right  "};
 static final String[] FRAME_LENTICULAR_LABEL = { "00 ", "01 ", "02 ", "03 ", "04 ", "05 ", "06 ", "07 ", "08 ", "09 "};
 
 static final String PNG = ".png";
@@ -93,8 +94,10 @@ int TEXT_SIZE;  // in pixels
 int TEXT_SIZE2;  // in pixels
 
 int CROSSHAIR_SIZE = 40;
-float CROSSHAIR_SPACING_PERCENT = 0.75;
+float CROSSHAIR_SPACING_PERCENT = 1.00;
 float CROSSHAIR_SPACING_INCREMENT = 0.05;
+int MIDHORZ = 6; // for crosshair lines
+
 color[] textColor = {color(128), color(255), color(0), color(255, 0, 0), color(0, 255, 0), color(0, 0, 255) };
 color[] crosshairColor = {color(64), color(192), color(128), color(0, 255, 255), color(255, 0, 255), color(255, 255, 0) };
 int textColorIndex = 4;
@@ -109,7 +112,7 @@ int parallax = 0;
 
 // counter numbers a group of images single, 3D, 4V, and Lenticular
 // for output filename grouping of the same related images
-int counter = 1;
+int counter = 1;  // group counter
 
 static final String emptyStr = "";
 String   savedSingleFn = emptyStr;
@@ -134,6 +137,10 @@ void resetSavedFn() {
   parallax = 0;
   offsetX = 0;
   offsetY = 0;
+  lastMouseX = 0;
+  lastMouseY = 0;
+  leftMouseX = 0;
+  rightMouseX = 0;
 }
 
 void settings() {
@@ -163,8 +170,14 @@ void setup() {
 
   helpLegend = loadStrings("../help.txt");
 
-  name = filename.substring(0, filename.indexOf(".mp4"));
-  if (DEBUG) println(name);
+  if (filename.toLowerCase().startsWith("http")) {
+    name = filename.substring(filename.lastIndexOf("/")+1);
+  } else {
+    name = filename.substring(0, filename.indexOf("."));
+  }
+
+  //name = filename.substring(0, filename.indexOf(".mp4"));
+  if (DEBUG) println("name="+name);
 
   if (DEBUG) println("TEXT_SIZE = "+TEXT_SIZE);
   // Load and set the video to play. Setting the video 
@@ -252,9 +265,7 @@ void draw() {
     }
   } else {
     if (lastMouseX > 0 ) {
-      fill(textColor[textColorIndex]);
-      text(FRAME_TYPE_STR[frameType], lastMouseX, lastMouseY);
-      drawCrosshairs(lastMouseX, lastMouseY, CROSSHAIR_SPACING_PERCENT);
+      drawSpacingCrosshairs(lastMouseX+offsetX, lastMouseY+offsetY, CROSSHAIR_SPACING_PERCENT);
     }
   }
 
@@ -307,6 +318,7 @@ void savePhoto(String fn, String prefix, boolean saveName, boolean highRes) {
       displayMessage("Saved original resolution: "+lfn, 30);
     } else {
       savedAnaglyphFn = lfn;
+      displayMessage("Saved: "+lfn, 30);
       save(lfn);
     }
   }
@@ -358,8 +370,7 @@ void play() {
 /**
  * Draw vertical lines spaced a percentage of horizontal width
  */
-
-void drawGrid(float percent) {
+void drawVerticalLineGrid(float percent) {
   stroke(textColor[textColorIndex]);
   float s = (percent * width)/100.0;
   for (float d = s; d < float(width); d += s) {
@@ -367,8 +378,9 @@ void drawGrid(float percent) {
   }
 }
 
-void drawCrosshairs(float x, float y, float percent) {
-  int MIDHORZ = 6;
+// Draw horizontal spacing crosshairs for feature alignment and disparity measurement
+void drawSpacingCrosshairs(float x, float y, float percent) {
+
   float s = (percent * width)/100.0;
   stroke(crosshairColor[textColorIndex]);
   line(lastMouseX-3*CROSSHAIR_SIZE, lastMouseY, lastMouseX+3*CROSSHAIR_SIZE, lastMouseY);
@@ -380,12 +392,27 @@ void drawCrosshairs(float x, float y, float percent) {
     }
     line(x+(float(d)-MIDHORZ)*s, y-2*CROSSHAIR_SIZE, x+(float(d)-MIDHORZ)*s, y+2*CROSSHAIR_SIZE);
   }
-  drawCrosshair(saveMouseX, saveMouseY);
+    fill(textColor[textColorIndex]);
+    text(FRAME_TYPE_STR[frameType], x, y);
+
+  drawFeatureCrosshair(saveMouseX, saveMouseY, percent);
 }
 
-void drawCrosshair(float x, float y) {
+void drawFeatureCrosshair(float x, float y, float percent) {
   if (x == 0 && y == 0) return;
-  stroke(crosshairColor[textColorIndex]);
+  float s = (percent * width)/100.0;
+
+  stroke(textColor[textColorIndex]);
   line(x, 0, x, height);
   line(0, y, width, y);
+  for (int d = 0; d < (2*MIDHORZ+1); d++) {
+    //if (d == MIDHORZ ) {
+    stroke(crosshairColor[textColorIndex]);
+    //} else {
+    //  stroke(textColor[textColorIndex]);
+    //}
+    line(x+(float(d)-MIDHORZ)*s, y-2*CROSSHAIR_SIZE, x+(float(d)-MIDHORZ)*s, y+2*CROSSHAIR_SIZE);
+  }
+
+  text(FRAME_TYPE_STR[saveFrameType], x, y);
 }

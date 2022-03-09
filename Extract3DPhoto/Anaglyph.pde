@@ -38,8 +38,8 @@ PImage createAnaglyph(String leftFn, String rightFn) {
     return null;
   }
   parallax = leftMouseX - rightMouseX;
-  img = colorAnaglyph(left, right, parallax);
-  //img = colorAnaglyph(left, right);
+  //img = colorAnaglyph(left, right, parallax);
+  img = colorAnaglyph(left, right);
 
   return img;
 }

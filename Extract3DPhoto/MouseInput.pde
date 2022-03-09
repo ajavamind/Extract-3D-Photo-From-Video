@@ -6,8 +6,9 @@ int lastMouseY = 0;
 int leftMouseX = 0;
 int rightMouseX = 0;
 
-float saveMouseX = 0;
-float saveMouseY = 0;
+int saveMouseX = 0;
+int saveMouseY = 0;
+int saveFrameType = 0;
 
 int clickNumber = 1;
 boolean firstClick = false; // used to give window focus for key press input

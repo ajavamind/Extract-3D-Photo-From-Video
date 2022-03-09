@@ -159,6 +159,9 @@ void fileSelected(File selection) {
     if (DEBUG) println("filenamePath="+filenamePath);
     if (DEBUG) println("filename="+filename);
     newVideo = true;
+    resetSavedFn();
+    counter = 1;
+    lastKeyCode = KEYCODE_Z;
   }
 }
 
