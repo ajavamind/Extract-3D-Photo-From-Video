@@ -392,8 +392,8 @@ void drawSpacingCrosshairs(float x, float y, float percent) {
     }
     line(x+(float(d)-MIDHORZ)*s, y-2*CROSSHAIR_SIZE, x+(float(d)-MIDHORZ)*s, y+2*CROSSHAIR_SIZE);
   }
-    fill(textColor[textColorIndex]);
-    text(FRAME_TYPE_STR[frameType], x, y);
+  fill(textColor[textColorIndex]);
+  text(FRAME_TYPE_STR[frameType], x, y);
 
   drawFeatureCrosshair(saveMouseX, saveMouseY, percent);
 }
@@ -414,5 +414,11 @@ void drawFeatureCrosshair(float x, float y, float percent) {
     line(x+(float(d)-MIDHORZ)*s, y-2*CROSSHAIR_SIZE, x+(float(d)-MIDHORZ)*s, y+2*CROSSHAIR_SIZE);
   }
 
-  text(FRAME_TYPE_STR[saveFrameType], x, y);
+  if (saveFrameType == FRAME_TYPE_LEFT) {
+    text(FRAME_TYPE_STR[saveFrameType], x+CROSSHAIR_SIZE, y-CROSSHAIR_SIZE);
+  } else if (saveFrameType == FRAME_TYPE_LEFT_LEFT) {
+    text(FRAME_TYPE_STR[saveFrameType], x+CROSSHAIR_SIZE, y-CROSSHAIR_SIZE);
+  } else {
+    text(FRAME_TYPE_STR[saveFrameType], x, y);
+  }
 }

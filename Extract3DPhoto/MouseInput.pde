@@ -18,6 +18,7 @@ void mousePressed() {
     lastKey = 0;
     lastMouseX = mouseX;
     lastMouseY = mouseY;
+    frameType = FRAME_TYPE_MISSING;
   }
 }
 

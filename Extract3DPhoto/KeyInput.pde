@@ -182,6 +182,9 @@ boolean keyUpdate() {
     if (DEBUG) println("saveMouseX="+saveMouseX + " saveMouseY="+saveMouseY);
     break;
   case KEYCODE_0:
+    saveMouseX = lastMouseX;
+    saveMouseY = lastMouseY;
+    saveFrameType = FRAME_TYPE_BASE_LENTICULAR + lastKeyCode - KEYCODE_0;
   case KEYCODE_1:
   case KEYCODE_2:
   case KEYCODE_3:
