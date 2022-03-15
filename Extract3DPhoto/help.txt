@@ -33,9 +33,11 @@ R         - Set Right Frame as _R (3D mode) or _RR (4V mode)
           - Right Frame with suffix _R (3D mode) or _RR (4V mode)
           - Lenticular Frame with suffix _00 to _09 (Lenticular mode)
 		  
-S         - Saves Anaglyph Screen		  
 K         - Save Frame at same resolution as video without offsets
-		  
+			Align with Stereo Photo Maker or other software
+			
+S		  - save 3D SBS or 4V file using Windows batch file
+
 +         - Advance Group filename counter
 -         - Reduce Group filename counter
 
@@ -49,9 +51,10 @@ For current video frame:
    Right Arrow - Shift display right 1 pixel
    Up Arrow    - Shift display up 1 pixel
    Down Arrow  - Shift display down 1 pixel
-
+   Automatically saves shifted display.
+   
 A         - Toggle showing 3D frames (_L and _R) as Anaglyph
-            Toggle showing 4V frames (_LL, _LM, _RM, _RR) as _2x2 quad
+            Toggle showing 4V frames (_LL, _LM, _RM, _RR) as _2x2 quad - not implemented
 X         - Swap Left and Right Images in 3D Anaglyph Display Mode
 [         - Reduce crosshair spacing percent of screen width
 ]         - Increase crosshair spacing percent of screen width

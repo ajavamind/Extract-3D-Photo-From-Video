@@ -41,6 +41,8 @@ PImage screen;
 boolean anaglyph = false;
 boolean newVideo = false;
 boolean leftToRight = true;
+boolean updated = false;  // screen change requires savePhoto
+boolean crosshair = true;
 
 static final int MODE_SINGLE = 0;
 static final int MODE_3D = 1;
@@ -118,7 +120,7 @@ static final String emptyStr = "";
 String   savedSingleFn = emptyStr;
 String[] saved3DFn = { emptyStr, emptyStr};
 String[] saved4VFn = { emptyStr, emptyStr, emptyStr, emptyStr};
-String[] savedLenticularFn = { emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr};
+String[] savedLentFn = { emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr, emptyStr};
 String savedAnaglyphFn = emptyStr;
 
 void resetSavedFn() {
@@ -130,7 +132,7 @@ void resetSavedFn() {
     saved4VFn[i] = emptyStr;
   }
   for (int i=0; i<NUM_LENTICULAR; i++) {
-    savedLenticularFn[i] = emptyStr;
+    savedLentFn[i] = emptyStr;
   }
   savedAnaglyphFn = emptyStr;
   frameType = FRAME_TYPE_MISSING;
@@ -223,6 +225,10 @@ void draw() {
     image(screen, 0, 0, screen.width, screen.height);
   } else {
     image(mov, offsetX, offsetY, width, height);
+    if (updated) {
+      updated = false;
+      savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+    }
   }
   keyUpdate();
 
@@ -254,7 +260,7 @@ void draw() {
     }
   } else if (mode == MODE_LENTICULAR) {
     for (int i=0; i<NUM_LENTICULAR; i++) {
-      text(FRAME_LENTICULAR_LABEL[i]+savedLenticularFn[i], 10, 270 + i*30);
+      text(FRAME_LENTICULAR_LABEL[i]+savedLentFn[i], 10, 270 + i*30);
     }
   } else if (mode == MODE_SINGLE) {
     text("SINGLE "+savedSingleFn, 10, 270 );
@@ -309,7 +315,7 @@ void savePhoto(String fn, String prefix, boolean saveName, boolean highRes) {
     } else if (mode == MODE_4V) {
       saved4VFn[frameType - FRAME_TYPE_LEFT_LEFT] = lfn;
     } else if (mode == MODE_LENTICULAR) {
-      savedLenticularFn[frameType - FRAME_TYPE_BASE_LENTICULAR] = lfn;
+      savedLentFn[frameType - FRAME_TYPE_BASE_LENTICULAR] = lfn;
     }
     save(lfn);
   } else {
@@ -382,22 +388,23 @@ void drawVerticalLineGrid(float percent) {
 
 // Draw horizontal spacing crosshairs for feature alignment and disparity measurement
 void drawSpacingCrosshairs(float x, float y, float percent) {
-
-  float s = (percent * width)/100.0;
-  stroke(crosshairColor[textColorIndex]);
-  line(lastMouseX-3*CROSSHAIR_SIZE, y, lastMouseX+3*CROSSHAIR_SIZE, y);
-  for (int d = 0; d < (2*MIDHORZ+1); d++) {
-    if (d == MIDHORZ ) {
-      stroke(crosshairColor[textColorIndex]);
-    } else {
-      stroke(textColor[textColorIndex]);
+  if (crosshair) {
+    float s = (percent * width)/100.0;
+    stroke(crosshairColor[textColorIndex]);
+    line(lastMouseX-3*CROSSHAIR_SIZE, y, lastMouseX+3*CROSSHAIR_SIZE, y);
+    for (int d = 0; d < (2*MIDHORZ+1); d++) {
+      if (d == MIDHORZ ) {
+        stroke(crosshairColor[textColorIndex]);
+      } else {
+        stroke(textColor[textColorIndex]);
+      }
+      line(x+(float(d)-MIDHORZ)*s, y-2*CROSSHAIR_SIZE, x+(float(d)-MIDHORZ)*s, y+2*CROSSHAIR_SIZE);
     }
-    line(x+(float(d)-MIDHORZ)*s, y-2*CROSSHAIR_SIZE, x+(float(d)-MIDHORZ)*s, y+2*CROSSHAIR_SIZE);
-  }
-  fill(textColor[textColorIndex]);
-  text(FRAME_TYPE_STR[frameType], x, y);
+    fill(textColor[textColorIndex]);
+    text(FRAME_TYPE_STR[frameType], x, y);
 
-  drawFeatureCrosshair(saveMouseX, saveMouseY, percent);
+    drawFeatureCrosshair(saveMouseX, saveMouseY, percent);
+  }
 }
 
 void drawFeatureCrosshair(float x, float y, float percent) {

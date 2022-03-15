@@ -105,14 +105,14 @@ boolean keyUpdate() {
   } else if (anaglyph) {
     if (lastKeyCode == KEYCODE_X) {
       leftToRight = ! leftToRight;
-    //} else if (lastKeyCode == LEFT) {
-    //  offsetX--;
-    //} else if (lastKeyCode == RIGHT) {
-    //  offsetX++;
-    //} else if (lastKeyCode == UP) {
-    //  offsetY--;
-    //} else if (lastKeyCode == DOWN) {
-    //  offsetY++;
+      //} else if (lastKeyCode == LEFT) {
+      //  offsetX--;
+      //} else if (lastKeyCode == RIGHT) {
+      //  offsetX++;
+      //} else if (lastKeyCode == UP) {
+      //  offsetY--;
+      //} else if (lastKeyCode == DOWN) {
+      //  offsetY++;
     } else {
       lastKey = 0;
       lastKeyCode = 0;
@@ -166,15 +166,19 @@ boolean keyUpdate() {
     break;
   case LEFT:
     offsetX--;
+    updated = true;
     break;
   case RIGHT:
     offsetX++;
+    updated = true;
     break;
   case UP:
     offsetY--;
+    updated = true;
     break;
   case DOWN:
     offsetY++;
+    updated = true;
     break;
   case KEYCODE_W: // debug output including stereo window parallax offset
     parallax = saveMouseX - rightMouseX;
@@ -246,16 +250,26 @@ boolean keyUpdate() {
   case KEYCODE_K:
     savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "F", false, true);
     break;
-  case KEYCODE_Q:  // TODO
-    println("launch makeSBS.bat");
+  case KEYCODE_S:
     //launch(sketchPath("")+"makeSBS.bat");
-    exec(".\\makeSBS.bat");
+    if (mode == MODE_3D) {
+      if (DEBUG) println("Launch Windows Batch File   "+sketchPath("") + "makeSBS.bat");
+      launch(sketchPath("") + "makeSBS.bat "+ saved3DFn[0] + " " + saved3DFn[1] + " "+ outputFolderPath+File.separator +name);
+    } else if (mode == MODE_4V) {
+      if (DEBUG) println("Launch Windows Batch File   "+sketchPath("")+"make4v.bat");
+      launch(sketchPath("") + "make4v.bat "+ saved4VFn[0] + " " + saved4VFn[1] + " "+ 
+        saved4VFn[2] + " " + saved4VFn[3] + " " + outputFolderPath+File.separator +name);
+    } else if (mode == MODE_LENTICULAR) {
+      if (DEBUG) println("Launch Windows Batch File   "+sketchPath("")+"makeLGP.bat");
+      launch(sketchPath("") + "makeLGP.bat "+ outputFolderPath + File.separator + name + " " + 
+        savedLentFn[4] + " " + savedLentFn[5] + " " + savedLentFn[6] + " " + savedLentFn[7] + " " +
+        savedLentFn[0] + " " + savedLentFn[1] + " " + savedLentFn[2] + " " + savedLentFn[3] );
+    }
     break;
-    //case KEYCODE_G:
-    //  saveMouseX = lastMouseX;
-    //  saveMouseY = lastMouseY;
-    //  saveFrameType = frameType;
-    //  break;
+  case KEYCODE_G:
+    // toggle crosshair display
+    crosshair = !crosshair;
+    break;
   case KEYCODE_L:
     if (mode == MODE_3D) {
       frameType = FRAME_TYPE_LEFT;
@@ -269,13 +283,6 @@ boolean keyUpdate() {
     saveFrameType = frameType;
     savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     break;
-    //case KEYCODE_S:
-    //  if (anaglyph) {
-    //    savePhoto(name+"_"+counter+"_"+leftFrame+"L"+rightFrame+"R"+"_ana"+outputFileType, "", false, false);
-    //  } else {
-    //    savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
-    //  }
-    //  break;
   case KEYCODE_M:
     if (mode == MODE_4V) {
       frameType = FRAME_TYPE_LEFT_MIDDLE;
