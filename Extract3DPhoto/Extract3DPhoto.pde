@@ -139,6 +139,8 @@ void resetSavedFn() {
   offsetY = 0;
   lastMouseX = 0;
   lastMouseY = 0;
+  saveMouseX = 0;
+  saveMouseY = 0;
   leftMouseX = 0;
   rightMouseX = 0;
 }
@@ -231,8 +233,8 @@ void draw() {
   text("Output Folder: "+outputFolderPath, 10, 60);
   text("Frame: "+currentFrame + " / " + (getLength() - 1)+ " offsetX="+offsetX + " offsetY="+offsetY, 10, 90);
 
-  String lr = "Truck Left to Right ";
-  if (!leftToRight) lr = "Truck Right to Left ";
+  String lr = "Parallel L/R  ";
+  if (!leftToRight) lr = "Crosseye R/L  ";
   text(lr + "Mode: "+ modeString, 10, 120);
 
   text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 150);
@@ -264,7 +266,7 @@ void draw() {
       text(helpLegend[i], width/2, 30 + i*TEXT_SIZE2);
     }
   } else {
-    if (lastMouseX > 0 ) {
+    if (lastMouseX > 0 || lastMouseY > 0 ) {
       drawSpacingCrosshairs(lastMouseX+offsetX, lastMouseY+offsetY, CROSSHAIR_SPACING_PERCENT);
     }
   }
@@ -319,7 +321,7 @@ void savePhoto(String fn, String prefix, boolean saveName, boolean highRes) {
     } else {
       savedAnaglyphFn = lfn;
       displayMessage("Saved: "+lfn, 30);
-      save(lfn);
+      screen.save(lfn);
     }
   }
 
@@ -383,7 +385,7 @@ void drawSpacingCrosshairs(float x, float y, float percent) {
 
   float s = (percent * width)/100.0;
   stroke(crosshairColor[textColorIndex]);
-  line(lastMouseX-3*CROSSHAIR_SIZE, lastMouseY, lastMouseX+3*CROSSHAIR_SIZE, lastMouseY);
+  line(lastMouseX-3*CROSSHAIR_SIZE, y, lastMouseX+3*CROSSHAIR_SIZE, y);
   for (int d = 0; d < (2*MIDHORZ+1); d++) {
     if (d == MIDHORZ ) {
       stroke(crosshairColor[textColorIndex]);

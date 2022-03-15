@@ -80,47 +80,53 @@ void keyPressed() {
 // returns false no key processed
 // returns true when a key is processed
 boolean keyUpdate() {
+  //if (DEBUG) println("keyUpdate lastKey="+lastKey + " lastKeyCode="+lastKeyCode);
   if (lastKey == 0 && lastKeyCode == 0) {
     return false;
   }
-  //if (DEBUG) println("keyUpdate lastKey="+lastKey + " lastKeyCode="+lastKeyCode);
 
   if (lastKeyCode == KEYCODE_A && mode == MODE_3D) {
     anaglyph = !anaglyph;
-    screen = makeAnaglyph(anaglyph);
+    if (anaglyph) {
+      screen = makeAnaglyph(true);
+      if (screen != null) {
+        if (leftToRight) {
+          savePhoto(name+"_"+counter+"_"+leftFrame+"L"+rightFrame+"R"+"_ana"+outputFileType, "", false, false);
+        } else {
+          savePhoto(name+"_"+counter+"_"+rightFrame+"L"+leftFrame+"R"+"_ana"+outputFileType, "", false, false);
+        }
+      }
+    } else {
+      screen = null;
+    }
     lastKey = 0;
     lastKeyCode = 0;
     return true;
-  }
-  if (anaglyph) {
-    if (lastKeyCode == KEYCODE_S) {
-      savePhoto(name+"_"+counter+"_"+leftFrame+"L"+rightFrame+"R"+"_ana"+outputFileType, "", false, false);
-      lastKey = 0;
-      lastKeyCode = 0;
-      return true;
-    } else if (lastKeyCode == KEYCODE_X) {
+  } else if (anaglyph) {
+    if (lastKeyCode == KEYCODE_X) {
       leftToRight = ! leftToRight;
-      screen = makeAnaglyph(true);
-      lastKey = 0;
-      lastKeyCode = 0;
-      return true;
     //} else if (lastKeyCode == LEFT) {
     //  offsetX--;
-    //  screen = makeAnaglyph(anaglyph);
     //} else if (lastKeyCode == RIGHT) {
     //  offsetX++;
-    //  screen = makeAnaglyph(anaglyph);
     //} else if (lastKeyCode == UP) {
     //  offsetY--;
-    //  screen = makeAnaglyph(anaglyph);
     //} else if (lastKeyCode == DOWN) {
     //  offsetY++;
-    //  screen = makeAnaglyph(anaglyph);
     } else {
       lastKey = 0;
       lastKeyCode = 0;
       return true;
     }
+    screen = makeAnaglyph(true);
+    if (leftToRight) {
+      savePhoto(name+"_"+counter+"_"+leftFrame+"L"+rightFrame+"R"+"_ana"+outputFileType, "", false, false);
+    } else {
+      savePhoto(name+"_"+counter+"_"+rightFrame+"L"+leftFrame+"R"+"_ana"+outputFileType, "", false, false);
+    }
+    lastKey = 0;
+    lastKeyCode = 0;
+    return true;
   }
 
   switch (lastKeyCode) {
@@ -160,19 +166,15 @@ boolean keyUpdate() {
     break;
   case LEFT:
     offsetX--;
-    //frameType = FRAME_TYPE_MISSING;
     break;
   case RIGHT:
     offsetX++;
-    //frameType = FRAME_TYPE_MISSING;
     break;
   case UP:
     offsetY--;
-    //frameType = FRAME_TYPE_MISSING;
     break;
   case DOWN:
     offsetY++;
-    //frameType = FRAME_TYPE_MISSING;
     break;
   case KEYCODE_W: // debug output including stereo window parallax offset
     parallax = saveMouseX - rightMouseX;
