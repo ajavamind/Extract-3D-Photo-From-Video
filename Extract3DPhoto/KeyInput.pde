@@ -255,20 +255,23 @@ boolean keyUpdate() {
     if (mode == MODE_3D) {
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("") + "makeSBS.bat");
       launch(sketchPath("") + "makeSBS.bat "+ saved3DFn[0] + " " + saved3DFn[1] + " "+ outputFolderPath+File.separator +name);
+      displayMessage("Save SBS 3D Photo", 30);
     } else if (mode == MODE_4V) {
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("")+"make4v.bat");
       launch(sketchPath("") + "make4v.bat "+ saved4VFn[0] + " " + saved4VFn[1] + " "+ 
         saved4VFn[2] + " " + saved4VFn[3] + " " + outputFolderPath+File.separator +name);
-    } else if (mode == MODE_LENTICULAR) {
+      displayMessage("Save 4V 3D Photo", 30);
+    } else if (mode == MODE_LENTICULAR) { // Note: incomplete work in progress
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("")+"makeLGP.bat");
       launch(sketchPath("") + "makeLGP.bat "+ outputFolderPath + File.separator + name + " " + 
         savedLentFn[4] + " " + savedLentFn[5] + " " + savedLentFn[6] + " " + savedLentFn[7] + " " +
         savedLentFn[0] + " " + savedLentFn[1] + " " + savedLentFn[2] + " " + savedLentFn[3] );
+      displayMessage("Save Quilt 3D Photo", 30);
     }
     break;
   case KEYCODE_G:
     // toggle crosshair display
-    crosshair = !crosshair;
+    showCrosshair = !showCrosshair;
     break;
   case KEYCODE_L:
     if (mode == MODE_3D) {
@@ -306,7 +309,10 @@ boolean keyUpdate() {
     savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     break;
   case KEYCODE_H:
-    showHelp = !showHelp;
+    showHelp++;
+    if (showHelp > NO_HELP) {
+      showHelp = INFO;
+    }
     break;
   case KEYCODE_PLUS:
     counter++;

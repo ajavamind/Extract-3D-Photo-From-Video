@@ -15,7 +15,8 @@ Space     - Next Video Frame
 Backspace - Previous Video Frame
 
 Mouse click sets crosshair at cursor location 
-   
+G         - Toggles crosshair display on and off  
+
 Z         - Rewind video
 TAB       - Jump 10 frames ahead
 

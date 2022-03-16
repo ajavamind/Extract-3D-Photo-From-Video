@@ -42,7 +42,7 @@ boolean anaglyph = false;
 boolean newVideo = false;
 boolean leftToRight = true;
 boolean updated = false;  // screen change requires savePhoto
-boolean crosshair = true;
+boolean showCrosshair = true;
 
 static final int MODE_SINGLE = 0;
 static final int MODE_3D = 1;
@@ -104,7 +104,10 @@ color[] textColor = {color(128), color(255), color(0), color(255, 0, 0), color(0
 color[] crosshairColor = {color(64), color(192), color(128), color(0, 255, 255), color(255, 0, 255), color(255, 255, 0) };
 int textColorIndex = 4;
 
-boolean showHelp = false;
+static final int INFO = 0;
+static final int LEGEND = 1;
+static final int NO_HELP = 2;
+int showHelp = INFO;
 String[] helpLegend;
 
 // current frame display shift
@@ -162,14 +165,14 @@ void setup() {
   TEXT_SIZE2 = width/120;
   fill(255);
   textSize(TEXT_SIZE);
-  surface.setTitle("Extract 3D Photo From Video File");
-  text("Extract 3D Photo From Video File", 20, 100);
+  surface.setTitle("Extract 3D Photos From a Video File");
+  text("Extract 3D Photos From a Video File", 20, 100);
   text("Version "+VERSION+ " BUILD " + BUILD + " "+ (DEBUG ? "DEBUG" : ""), 20, 130);
   text("Copyright 2022 Andy Modla", 20, 160);
   text("All Rights Reserved", 20, 190);
   text("Loading Sample 4K Video File", 20, 300);
 
-  text("Do Mouse Click to Start", 20, 360);
+  text("Press Left Mouse Button to Start", 20, 360);
   openFileSystem();
 
   helpLegend = loadStrings("../help.txt");
@@ -232,46 +235,50 @@ void draw() {
   }
   keyUpdate();
 
-  fill(textColor[textColorIndex]);
-  textSize(TEXT_SIZE);
-  text("Input: "+filename + " width="+mov.width+" height="+mov.height+" "+mov.frameRate+" FPS", 10, 30);
-  //parallax = leftMouseX - rightMouseX;
-  text("Output Folder: "+outputFolderPath, 10, 60);
-  text("Frame: "+currentFrame + " / " + (getLength() - 1)+ " offsetX="+offsetX + " offsetY="+offsetY, 10, 90);
+  if (showHelp == INFO) {
+    fill(textColor[textColorIndex]);
+    textSize(TEXT_SIZE);
+    text("Input: "+filename + " width="+mov.width+" height="+mov.height+" "+mov.frameRate+" FPS", 10, 30);
+    //parallax = leftMouseX - rightMouseX;
+    text("Output Folder: "+outputFolderPath, 10, 60);
+    text("Frame: "+currentFrame + " / " + (getLength() - 1)+ " Type: "+FRAME_TYPE_STR[frameType]
+      , 10, 90);
 
-  String lr = "Parallel L/R  ";
-  if (!leftToRight) lr = "Crosseye R/L  ";
-  text(lr + "Mode: "+ modeString, 10, 120);
+    String lr = "Parallel L/R  ";
+    if (!leftToRight) lr = "Crosseye R/L  ";
+    text(lr + "Mode: "+ modeString, 10, 120);
 
-  text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 150);
-  //text("Output: " +name+"_"+counter+"_"+currentFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
-  text("Group Counter: "+counter + " Frame Type "+FRAME_TYPE_STR[frameType], 10, 180);
-  text("Type H for Key Function Legend", 10, 210);
-  text("Saved Files for Group "+counter+":", 10, 240);
+    text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 150);
+    //text("Output: " +name+"_"+counter+"_"+currentFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
+    text("Group Counter: "+counter + " offsetX="+offsetX + " offsetY="+offsetY, 10, 180);
+    text("Type H to Toggle Key Command Help", 10, 210);
+    text("Saved Files for Group "+counter+":", 10, 240);
 
-  if (mode == MODE_3D) {
-    for (int i=0; i<NUM_3D; i++) {
-      text(FRAME_3D_LABEL[i]+saved3DFn[i], 10, 270 + i*30);
+    if (mode == MODE_3D) {
+      for (int i=0; i<NUM_3D; i++) {
+        text(FRAME_3D_LABEL[i]+saved3DFn[i], 10, 270 + i*30);
+      }
+      text("Anaglyph "+savedAnaglyphFn, 10, 270 + 2*30);
+    } else if (mode == MODE_4V) {
+      for (int i=0; i<NUM_4V; i++) {
+        text(FRAME_4V_LABEL[i]+saved4VFn[i], 10, 270 + i*30);
+      }
+    } else if (mode == MODE_LENTICULAR) {
+      for (int i=0; i<NUM_LENTICULAR; i++) {
+        text(FRAME_LENTICULAR_LABEL[i]+savedLentFn[i], 10, 270 + i*30);
+      }
+    } else if (mode == MODE_SINGLE) {
+      text("SINGLE "+savedSingleFn, 10, 270 );
     }
-    text("Anaglyph "+savedAnaglyphFn, 10, 270 + 2*30);
-  } else if (mode == MODE_4V) {
-    for (int i=0; i<NUM_4V; i++) {
-      text(FRAME_4V_LABEL[i]+saved4VFn[i], 10, 270 + i*30);
-    }
-  } else if (mode == MODE_LENTICULAR) {
-    for (int i=0; i<NUM_LENTICULAR; i++) {
-      text(FRAME_LENTICULAR_LABEL[i]+savedLentFn[i], 10, 270 + i*30);
-    }
-  } else if (mode == MODE_SINGLE) {
-    text("SINGLE "+savedSingleFn, 10, 270 );
   }
-
-  if (showHelp) {
+  if (showHelp == LEGEND) {
+    fill(textColor[textColorIndex]);
     textSize(TEXT_SIZE2);
     for (int i=0; i< helpLegend.length; i++) {
-      text(helpLegend[i], width/2, 30 + i*TEXT_SIZE2);
+      text(helpLegend[i], 10, 30 + i*TEXT_SIZE2);
     }
   } else {
+    textSize(TEXT_SIZE);
     if (lastMouseX > 0 || lastMouseY > 0 ) {
       drawSpacingCrosshairs(lastMouseX+offsetX, lastMouseY+offsetY, CROSSHAIR_SPACING_PERCENT);
     }
@@ -388,7 +395,7 @@ void drawVerticalLineGrid(float percent) {
 
 // Draw horizontal spacing crosshairs for feature alignment and disparity measurement
 void drawSpacingCrosshairs(float x, float y, float percent) {
-  if (crosshair) {
+  if (showCrosshair) {
     float s = (percent * width)/100.0;
     stroke(crosshairColor[textColorIndex]);
     line(lastMouseX-3*CROSSHAIR_SIZE, y, lastMouseX+3*CROSSHAIR_SIZE, y);
@@ -428,6 +435,6 @@ void drawFeatureCrosshair(float x, float y, float percent) {
   } else if (saveFrameType == FRAME_TYPE_LEFT_LEFT) {
     text(FRAME_TYPE_STR[saveFrameType], x+CROSSHAIR_SIZE, y-CROSSHAIR_SIZE);
   } else {
-    text(FRAME_TYPE_STR[saveFrameType], x, y);
+    text(FRAME_TYPE_STR[saveFrameType], x+CROSSHAIR_SIZE, y-CROSSHAIR_SIZE);
   }
 }
