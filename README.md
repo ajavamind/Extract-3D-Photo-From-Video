@@ -40,6 +40,8 @@ The Windows application exe file can be found in either application.windows32_ve
 The 32-bit version requires installation of Java.
 The 64-bit version has Java built-in.
 
+**Important: Remove the _version_1.0 directory suffix from the directory name to be able to run the exe without error when you move this directory to another folder.**
+
 ## Screenshot
 
 ![Analog screenshot](screenshots/screenshot_anaglyph.jpg)
