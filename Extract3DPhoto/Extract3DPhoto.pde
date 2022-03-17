@@ -23,8 +23,8 @@
 import processing.video.*;
 import select.files.*;
 
-//boolean DEBUG = false;
-boolean DEBUG = true;
+boolean DEBUG = false;
+//boolean DEBUG = true;
 String VERSION = "1.0";
 String BUILD = str(1);
 
