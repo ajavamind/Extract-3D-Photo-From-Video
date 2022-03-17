@@ -32,8 +32,13 @@ When you compile and run the Extract 3D Photo application in the Processing SDK 
 
 [SelectFile Library Documentation](https://andrusiv.com/android-select-file/)
 
-## The Application Environment
+## Application Environment
 The application requires ImageMagick software installed on the computer. It is used for creating side-by-side and 2x2 photo quilts. Windows batch files call ImageMagick for this task.
+
+## Running the Application
+The Windows application exe file can be found in either application.windows32_version_1.0 or application.windows64_version_1.0 folders.
+The 32-bit version requires installation of Java.
+The 64-bit version has Java built-in.
 
 ## Screenshot
 
