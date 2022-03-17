@@ -224,6 +224,8 @@ void draw() {
   }
 
   background(0);
+
+  keyUpdate();
   if (screen != null) {
     image(screen, 0, 0, screen.width, screen.height);
   } else {
@@ -233,7 +235,6 @@ void draw() {
       savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
   }
-  keyUpdate();
 
   if (showHelp == INFO) {
     fill(textColor[textColorIndex]);
@@ -311,8 +312,7 @@ void savePhoto(String fn, String prefix, boolean saveName, boolean highRes) {
   if (saveName) {
     if (mode == MODE_SINGLE) {
       savedSingleFn = lfn;
-    }
-    if (frameType ==FRAME_TYPE_MISSING) {
+    } else if (frameType == FRAME_TYPE_MISSING) {
       displayMessage("Frame Type Not Set", 60);
       return;
     }

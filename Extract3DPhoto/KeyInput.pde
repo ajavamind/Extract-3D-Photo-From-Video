@@ -59,8 +59,8 @@ static final int KEYCODE_MEDIA_STOP = 86;
 static final int KEYCODE_MEDIA_REWIND = 89;
 static final int KEYCODE_MEDIA_RECORD = 130;
 static final int KEYCODE_MEDIA_PAUSE = 127;
-static final int KEYCODE_MOVE_HOME       = 122;
-static final int KEYCODE_MOVE_END       = 123;
+static final int KEYCODE_MOVE_HOME = 122;
+static final int KEYCODE_MOVE_END  = 123;
 
 // lastKey and lastKeyCode are handled in the draw loop
 int lastKey;
@@ -188,9 +188,6 @@ boolean keyUpdate() {
     if (DEBUG) println("saveMouseX="+saveMouseX + " saveMouseY="+saveMouseY);
     break;
   case KEYCODE_0:
-    saveMouseX = lastMouseX;
-    saveMouseY = lastMouseY;
-    saveFrameType = FRAME_TYPE_BASE_LENTICULAR + lastKeyCode - KEYCODE_0;
   case KEYCODE_1:
   case KEYCODE_2:
   case KEYCODE_3:
@@ -201,9 +198,17 @@ boolean keyUpdate() {
   case KEYCODE_8:
   case KEYCODE_9:
     if (mode == MODE_LENTICULAR) {
+      if (lastKeyCode == KEYCODE_0) {
+        saveMouseX = lastMouseX;
+        saveMouseY = lastMouseY;
+        saveFrameType = FRAME_TYPE_BASE_LENTICULAR + lastKeyCode - KEYCODE_0;
+      }
       modeString = MODE_STR[mode];
       frameType = FRAME_TYPE_BASE_LENTICULAR + lastKeyCode - KEYCODE_0;
-      savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+      offsetX += saveMouseX - lastMouseX;
+      offsetY += saveMouseY - lastMouseY;
+      updated = true;
+      //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     } else {
       displayMessage("Not Lenticular Mode.", 30);
     }
@@ -218,11 +223,12 @@ boolean keyUpdate() {
     modeString = MODE_STR[mode];
     resetSavedFn();
     break;
-  case KEYCODE_Y: // set mode to Single
+  case KEYCODE_Y: // set mode to Single and save
     mode = MODE_SINGLE;
     modeString = MODE_STR[mode];
     frameType = FRAME_TYPE_SINGLE;
     resetSavedFn();
+    updated = true;
     break;
   case KEYCODE_T: // set mode to Lenticular
     mode = MODE_LENTICULAR;
@@ -254,16 +260,16 @@ boolean keyUpdate() {
     //launch(sketchPath("")+"makeSBS.bat");
     if (mode == MODE_3D) {
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("") + "makeSBS.bat");
-      launch(sketchPath("") + "makeSBS.bat "+ saved3DFn[0] + " " + saved3DFn[1] + " "+ outputFolderPath+File.separator +name);
+      launch(sketchPath("") + "makeSBS.bat "+ saved3DFn[0] + " " + saved3DFn[1] + " "+ outputFolderPath+File.separator +name + "_"+counter);
       displayMessage("Save SBS 3D Photo", 30);
     } else if (mode == MODE_4V) {
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("")+"make4v.bat");
       launch(sketchPath("") + "make4v.bat "+ saved4VFn[0] + " " + saved4VFn[1] + " "+ 
-        saved4VFn[2] + " " + saved4VFn[3] + " " + outputFolderPath+File.separator +name);
+        saved4VFn[2] + " " + saved4VFn[3] + " " + outputFolderPath+File.separator +name+"_"+counter);
       displayMessage("Save 4V 3D Photo", 30);
     } else if (mode == MODE_LENTICULAR) { // Note: incomplete work in progress
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("")+"makeLGP.bat");
-      launch(sketchPath("") + "makeLGP.bat "+ outputFolderPath + File.separator + name + " " + 
+      launch(sketchPath("") + "makeLGP.bat "+ outputFolderPath + File.separator + name + "_" + counter + " " + 
         savedLentFn[4] + " " + savedLentFn[5] + " " + savedLentFn[6] + " " + savedLentFn[7] + " " +
         savedLentFn[0] + " " + savedLentFn[1] + " " + savedLentFn[2] + " " + savedLentFn[3] );
       displayMessage("Save Quilt 3D Photo", 30);
@@ -280,22 +286,31 @@ boolean keyUpdate() {
       leftMouseX = lastMouseX;
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_LEFT_LEFT;
+    } else {
+      break;
     }
     saveMouseX = lastMouseX;
     saveMouseY = lastMouseY;
     saveFrameType = frameType;
-    savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+    updated = true;
+    //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     break;
   case KEYCODE_M:
     if (mode == MODE_4V) {
       frameType = FRAME_TYPE_LEFT_MIDDLE;
-      savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+      offsetX += saveMouseX - lastMouseX;
+      offsetY += saveMouseY - lastMouseY;
+      updated = true;
+      //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
     break;
   case KEYCODE_N:
     if (mode == MODE_4V) {
       frameType = FRAME_TYPE_RIGHT_MIDDLE;
-      savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+      offsetX += saveMouseX - lastMouseX;
+      offsetY += saveMouseY - lastMouseY;
+      updated = true;
+      //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
     break;
   case KEYCODE_R:
@@ -305,8 +320,13 @@ boolean keyUpdate() {
       rightMouseX = lastMouseX;
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_RIGHT_RIGHT;
+    } else {
+      break;
     }
-    savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+    offsetX += saveMouseX - lastMouseX;
+    offsetY += saveMouseY - lastMouseY;
+    updated = true;
+    //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     break;
   case KEYCODE_H:
     showHelp++;
