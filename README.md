@@ -1,5 +1,17 @@
 # Extract-3D-Photo-From-Video
-This Java application for Windows, written in the Processing language, assists with ___manual extraction___ of left and right eye image pairs from motion videos that truck left to right. Multiple groups of extracted images can be saved for 3D stereo photos, 4V quad stereo photos displayable on a Leia Lumpad glasses free 3D tablet display, and photo collections for creating 3D lenticular images. 
+
+## Motivation
+I like to capture 3D photos with a single camera, taking left and right eye view photos sequentially (the cha-cha method). This works for stationary subjects and static scenes without any motion. Any subject motion makes the stereo view uncomfortable to look at. Otherwise for events or subjects in motion, I use a homemade nearly synchronized twin camera rig for stereo capture and a 3D photo alignment tool like Stereo Photo Maker.
+
+When I use sequential left/right photo capture, I have to be aware of my subject distance and background to obtain an ideal interaxial spacing between shots. Sometimes I use multiple exposure in the camera to judge the camera spacing I need for good stereo. With a twin camera rig, the camera spacing determines how far from the subject I should be to get the best stereo photo.
+
+What if I used a single video (trucking) capture and picked out the left and right eye frames with images that give good stereo results. This way I do not need to be too concerned with my sequential shot camera spacing, I can select left/right view frames with good disparity for my subject. The major issue when shooting the video is getting smooth camera movement in a straight line to minimize poor stereo artifacts in the resulting 3D photo, making the photo uncomfortable to view. Otherwise I would need better tools for stereo photo alignment.
+
+I could not find an existing application to extract acceptable video frames for stereo viewing that would meet my needs, 
+so I wrote my own application and made it open source here. I was able to experiment and learn more about stereo photography writing this application.
+
+## The Application
+This Java application for Windows, written in the Processing language/framework SDK, assists with ___manual extraction___ of left and right eye image pairs from motion videos that truck left to right. Multiple groups of extracted images can be saved for 3D stereo photos, 4V quad stereo photos displayable on a Leia Lumpad glasses free 3D tablet display, and photo collections for creating 3D lenticular images. 
 
 The app requires a truck motion video that capture static scences of stationary subjects for 3D viewing after image extraction. The motion video contains multiple sequential image captures of left and right views without determining precise camera interaxial distances for the best stereo image capture based on the camera distance from the subject and background. The app aids to setting the best displacement between left and right eye views for comfortable 3D stereo viewing. 
  
