@@ -85,6 +85,44 @@ boolean keyUpdate() {
     return false;
   }
 
+  boolean common = true;
+  switch(lastKeyCode) {
+  case KEYCODE_G:
+    // toggle crosshair display
+    showCrosshair = !showCrosshair;
+    break;
+  case KEYCODE_H:
+    showHelp++;
+    if (showHelp > NO_HELP) {
+      showHelp = INFO;
+    }
+    break;
+  case KEYCODE_W: // debug output including stereo window parallax offset
+    parallax = saveMouseX - rightMouseX;
+    if (DEBUG) println("anaglyph=" + anaglyph +" parallax="+parallax);
+    if (DEBUG) println("lastMouseX="+lastMouseX+" lastMouseY="+lastMouseY);
+    if (DEBUG) println("leftMouseX="+leftMouseX + " rightMouseX="+rightMouseX);
+    if (DEBUG) println("saveMouseX="+saveMouseX + " saveMouseY="+saveMouseY);
+    break;
+  case KEYCODE_LEFT_BRACKET:
+    CROSSHAIR_SPACING_PERCENT = CROSSHAIR_SPACING_PERCENT-CROSSHAIR_SPACING_INCREMENT;
+    break;
+  case KEYCODE_RIGHT_BRACKET:
+    CROSSHAIR_SPACING_PERCENT = CROSSHAIR_SPACING_PERCENT+CROSSHAIR_SPACING_INCREMENT;
+    break;
+  case KEYCODE_C:
+    changeTextColor();
+    break;
+  default:
+    common = false;
+    break;
+  }
+  if (common) {
+    lastKey = 0;
+    lastKeyCode = 0;
+    return true;
+  }
+
   if (lastKeyCode == KEYCODE_A && mode == MODE_3D) {
     anaglyph = !anaglyph;
     if (anaglyph) {
@@ -180,13 +218,6 @@ boolean keyUpdate() {
     offsetY++;
     updated = true;
     break;
-  case KEYCODE_W: // debug output including stereo window parallax offset
-    parallax = saveMouseX - rightMouseX;
-    if (DEBUG) println("anaglyph=" + anaglyph +" parallax="+parallax);
-    if (DEBUG) println("lastMouseX="+lastMouseX+" lastMouseY="+lastMouseY);
-    if (DEBUG) println("leftMouseX="+leftMouseX + " rightMouseX="+rightMouseX);
-    if (DEBUG) println("saveMouseX="+saveMouseX + " saveMouseY="+saveMouseY);
-    break;
   case KEYCODE_0:
   case KEYCODE_1:
   case KEYCODE_2:
@@ -275,10 +306,6 @@ boolean keyUpdate() {
       displayMessage("Save Quilt 3D Photo", 30);
     }
     break;
-  case KEYCODE_G:
-    // toggle crosshair display
-    showCrosshair = !showCrosshair;
-    break;
   case KEYCODE_L:
     if (mode == MODE_3D) {
       frameType = FRAME_TYPE_LEFT;
@@ -323,16 +350,10 @@ boolean keyUpdate() {
     } else {
       break;
     }
-    offsetX += saveMouseX - lastMouseX;
-    offsetY += saveMouseY - lastMouseY;
+    offsetX = saveMouseX - lastMouseX;
+    offsetY = saveMouseY - lastMouseY;
     updated = true;
     //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
-    break;
-  case KEYCODE_H:
-    showHelp++;
-    if (showHelp > NO_HELP) {
-      showHelp = INFO;
-    }
     break;
   case KEYCODE_PLUS:
     counter++;
@@ -343,15 +364,6 @@ boolean keyUpdate() {
       counter--;
       resetSavedFn();
     }
-    break;
-  case KEYCODE_LEFT_BRACKET:
-    CROSSHAIR_SPACING_PERCENT = CROSSHAIR_SPACING_PERCENT-CROSSHAIR_SPACING_INCREMENT;
-    break;
-  case KEYCODE_RIGHT_BRACKET:
-    CROSSHAIR_SPACING_PERCENT = CROSSHAIR_SPACING_PERCENT+CROSSHAIR_SPACING_INCREMENT;
-    break;
-  case KEYCODE_C:
-    changeTextColor();
     break;
     // play input video file
   case KEYCODE_MEDIA_PLAY_PAUSE:
