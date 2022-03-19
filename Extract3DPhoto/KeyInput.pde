@@ -290,17 +290,19 @@ boolean keyUpdate() {
   case KEYCODE_S:
     //launch(sketchPath("")+"makeSBS.bat");
     if (mode == MODE_3D) {
-      if (DEBUG) println("Launch Windows Batch File   "+sketchPath("") + "makeSBS.bat");
-      launch(sketchPath("") + "makeSBS.bat "+ saved3DFn[0] + " " + saved3DFn[1] + " "+ outputFolderPath+File.separator +name + "_"+counter);
+      if (DEBUG) println("Launch Windows Batch File   "+sketchPath("data") + File.separator + "makeSBS.bat");
+      launch(sketchPath("data") + File.separator + "makeSBS.bat "+ saved3DFn[0] + " " + saved3DFn[1] + " "+ 
+      configuration[OUTPUT_FOLDER]+File.separator +name + "_"+counter+"_"+leftFrame+"L"+rightFrame+"R");
       displayMessage("Save SBS 3D Photo", 30);
     } else if (mode == MODE_4V) {
-      if (DEBUG) println("Launch Windows Batch File   "+sketchPath("")+"make4v.bat");
-      launch(sketchPath("") + "make4v.bat "+ saved4VFn[0] + " " + saved4VFn[1] + " "+ 
-        saved4VFn[2] + " " + saved4VFn[3] + " " + outputFolderPath+File.separator +name+"_"+counter);
+      if (DEBUG) println("Launch Windows Batch File   "+sketchPath("data") + File.separator +"make4v.bat");
+      launch(sketchPath("data") + File.separator + "make4v.bat "+ saved4VFn[0] + " " + saved4VFn[1] + " "+ 
+        saved4VFn[2] + " " + saved4VFn[3] + " " + 
+        configuration[OUTPUT_FOLDER]+File.separator +name+"_"+counter+"_"+leftFrame+"LL"+leftMiddleFrame+"LM"+rightMiddleFrame+"RM"+rightFrame+"RR");
       displayMessage("Save 4V 3D Photo", 30);
     } else if (mode == MODE_LENTICULAR) { // Note: incomplete work in progress
-      if (DEBUG) println("Launch Windows Batch File   "+sketchPath("")+"makeLGP.bat");
-      launch(sketchPath("") + "makeLGP.bat "+ outputFolderPath + File.separator + name + "_" + counter + " " + 
+      if (DEBUG) println("Launch Windows Batch File   "+sketchPath("data") + File.separator +"makeLGP.bat");
+      launch(sketchPath("data") + File.separator + "makeLGP.bat "+ configuration[OUTPUT_FOLDER] + File.separator + name + "_" + counter + " " + 
         savedLentFn[4] + " " + savedLentFn[5] + " " + savedLentFn[6] + " " + savedLentFn[7] + " " +
         savedLentFn[0] + " " + savedLentFn[1] + " " + savedLentFn[2] + " " + savedLentFn[3] );
       displayMessage("Save Quilt 3D Photo", 30);
@@ -313,6 +315,7 @@ boolean keyUpdate() {
       leftMouseX = lastMouseX;
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_LEFT_LEFT;
+      leftFrame = currentFrame;
     } else {
       break;
     }
@@ -328,6 +331,7 @@ boolean keyUpdate() {
       offsetX += saveMouseX - lastMouseX;
       offsetY += saveMouseY - lastMouseY;
       updated = true;
+      leftMiddleFrame = currentFrame;
       //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
     break;
@@ -336,6 +340,7 @@ boolean keyUpdate() {
       frameType = FRAME_TYPE_RIGHT_MIDDLE;
       offsetX += saveMouseX - lastMouseX;
       offsetY += saveMouseY - lastMouseY;
+      rightMiddleFrame = currentFrame;
       updated = true;
       //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
@@ -347,12 +352,18 @@ boolean keyUpdate() {
       rightMouseX = lastMouseX;
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_RIGHT_RIGHT;
+      rightFrame = currentFrame;
     } else {
       break;
     }
-    offsetX = saveMouseX - lastMouseX;
-    offsetY = saveMouseY - lastMouseY;
-    updated = true;
+    if (saveMouseX == 0 || saveMouseY == 0) {
+      displayMessage("Left Frame NOT Selected!", 30);
+      break;
+    } else {
+      offsetX = saveMouseX - lastMouseX;
+      offsetY = saveMouseY - lastMouseY;
+      updated = true;
+    }
     //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     break;
   case KEYCODE_PLUS:

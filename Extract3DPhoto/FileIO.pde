@@ -2,6 +2,7 @@
 // Java or Android platform build
 // Important Comment out the platform not used in the build
 // */
+//import select.files.*;  // for Android build
 
 //// Android Platform Build Mode NOT IMPLEMENTED
 //final static boolean ANDROID_MODE = true;
@@ -118,11 +119,11 @@
 // Java mode
 final static boolean ANDROID_MODE = false;
 
-SelectLibrary files;
+//SelectLibrary files;
 
-void openFileSystem() {
-  files = new SelectLibrary(this);
-}
+//void openFileSystem() {
+// files = new SelectLibrary(this);
+//}
 
 void selectVideoFile() {
   //if (DEBUG) println("Select Input Video File state="+stateName[state]);
@@ -138,12 +139,18 @@ void selectPhotoOutputFolder() {
   //  }
 }
 
-void saveConfig(String config) {
+void saveConfig(String[] config) {
+  saveStrings(sketchPath("data") + File.separator +defaultConfigFilename, config);
 }
 
-String loadConfig()
+String[] loadConfig()
 {
-  return null;
+  String[] config;
+  config = loadStrings(sketchPath("data") + File.separator + defaultConfigFilename);
+  if (config == null) {
+    return null;
+  }
+  return config;
 }
 
 void fileSelected(File selection) {
@@ -168,10 +175,11 @@ void fileSelected(File selection) {
 void folderSelected(File selection) {
   if (selection == null) {
     if (DEBUG) println("No Output Folder Selected.");
-    displayMessage("No Output Folder Selected. Using Folder: "+ outputFolderPath, 60);
+    displayMessage("No Output Folder Selected. Using Folder: "+ configuration[OUTPUT_FOLDER], 60);
   } else {
     if (DEBUG) println("Photo Output Folder selected " + selection.getAbsolutePath());
-    outputFolderPath = selection.getAbsolutePath();
+    configuration[OUTPUT_FOLDER] = selection.getAbsolutePath();
     displayMessage("Photo Output Folder Selected " + selection.getAbsolutePath(), 60);
+    saveConfig(configuration);
   }
 }

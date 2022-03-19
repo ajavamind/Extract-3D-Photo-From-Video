@@ -21,21 +21,24 @@
  */
 
 import processing.video.*;
-import select.files.*;
 
-boolean DEBUG = false;
-//boolean DEBUG = true;
-String VERSION = "1.0";
-String BUILD = str(1);
+//boolean DEBUG = false;
+static final boolean DEBUG = true;
+static final String VERSION = "1.1";
+static final String BUILD = str(1);
 
 String filename = "sample_whale_grapefruit_juice_noaudio.mp4";
 //String filename ="http://";  // TODO
 String filenamePath;
 String name;
+String defaultOutputFolderPath= "output";
 
-String outputFolderPath= "output";
-//String defaultFilename = "default.txt";
-//String configFilename;
+String defaultConfigFilename = "default.txt";
+static final int MAX_CONFIG = 3;
+String[] configuration = new String[MAX_CONFIG]; // make space for configuration strings
+static final int OUTPUT_FOLDER = 0;  // configuration index for output folder path
+static final int INPUT_FILENAME = 1;  // configuration index for input file path // TODO
+static final int INPUT_FILENAME_PATH = 2;
 
 PImage screen;
 boolean anaglyph = false;
@@ -90,6 +93,8 @@ int msgCounter = 0;
 
 Movie mov;
 int leftFrame = 1;
+int leftMiddleFrame = 1;
+int rightMiddleFrame = 1;
 int rightFrame = 1;
 int currentFrame = 1;
 int TEXT_SIZE;  // in pixels
@@ -156,7 +161,18 @@ void settings() {
   // size sets fixed size of output images
   //size(2560, 1440);
   size(1920, 1080);
+  //size(3840, 2160);
   //size(960, 540);
+
+  //openFileSystem(); // for Android
+  configuration = loadConfig();
+  if (configuration == null) {
+    configuration = new String[MAX_CONFIG];
+    for (int i=0; i<MAX_CONFIG; i++) {
+      configuration[i] = "";
+    }
+    configuration[OUTPUT_FOLDER] = defaultOutputFolderPath;
+  }
 }
 
 void setup() {
@@ -173,9 +189,8 @@ void setup() {
   text("Loading Sample 4K Video File", 20, 300);
 
   text("Press Left Mouse Button to Start", 20, 360);
-  openFileSystem();
 
-  helpLegend = loadStrings("../help.txt");
+  helpLegend = loadStrings(sketchPath("data") + File.separator + "help.txt");
 
   if (filename.toLowerCase().startsWith("http")) {
     name = filename.substring(filename.lastIndexOf("/")+1);
@@ -241,7 +256,7 @@ void draw() {
     textSize(TEXT_SIZE);
     text("Input: "+filename + " width="+mov.width+" height="+mov.height+" "+mov.frameRate+" FPS", 10, 30);
     //parallax = leftMouseX - rightMouseX;
-    text("Output Folder: "+outputFolderPath, 10, 60);
+    text("Output Folder: "+configuration[OUTPUT_FOLDER], 10, 60);
     text("Frame: "+currentFrame + " / " + (getLength() - 1)+ " Type: "+FRAME_TYPE_STR[frameType]
       , 10, 90);
 
@@ -308,7 +323,7 @@ void displayMessage(String msg, int counter) {
 }
 
 void savePhoto(String fn, String prefix, boolean saveName, boolean highRes) {
-  String lfn = outputFolderPath+File.separator+prefix+fn;
+  String lfn = configuration[OUTPUT_FOLDER]+File.separator+prefix+fn;
   if (saveName) {
     if (mode == MODE_SINGLE) {
       savedSingleFn = lfn;
