@@ -36,11 +36,8 @@ When you compile and run the Extract 3D Photo application in the Processing SDK 
 The application requires ImageMagick software installed on the computer. It is used for creating side-by-side and 2x2 photo quilts. Windows batch files call ImageMagick for this task.
 
 ## Running the Application
-The Windows application exe file can be found in either application.windows32_version_1.0 or application.windows64_version_1.0 folders.
-The 32-bit version requires installation of Java.
-The 64-bit version has Java built-in.
-
-**Important: Remove the _version_1.0 directory suffix from the directory name to be able to run the exe without error when you move this directory to another folder.**
+Create the Windows application exe file with the Processing SDK. This will be both application.windows32 or application.windows64 folders.
+The 32-bit version requires installation of Java. The 64-bit version has Java built-in.
 
 ## Screenshot
 
@@ -50,7 +47,10 @@ The 64-bit version has Java built-in.
 Other tools:
 
 ## Automated Tools
-These automated tools may be of interest:
+These automated tools may be of interest because they capture 3D images sequentially with a single camera:
+
+Camarada - Android app in Google play store at [https://play.google.com/store/apps/details?id=com.aimfire.camarada&hl=en_US&gl=US](https://play.google.com/store/apps/details?id=com.aimfire.camarada&hl=en_US&gl=US)
+
 
 ### Automated Left/Right Frame Extraction Script in Python
 [3D Videos 2 Stereo](https://github.com/lasinger/3DVideos2Stereo)
