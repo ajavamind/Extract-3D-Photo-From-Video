@@ -3,15 +3,17 @@
 ## Motivation
 I like to capture 3D photos with a single camera, taking left and right eye view photos sequentially (the cha-cha method). This works for stationary subjects and static scenes without any motion. Any subject motion makes the stereo view uncomfortable to look at. Otherwise for events or subjects in motion, I use a homemade nearly synchronized twin camera rig for stereo capture and a 3D photo alignment tool like Stereo Photo Maker.
 
-When I use sequential left/right photo capture, I have to be aware of my subject distance and background to obtain an ideal interaxial spacing between shots. Sometimes I use multiple exposure in the camera to judge the camera spacing I need for good stereo. With a twin camera rig, the camera spacing determines how far from the subject I should be to get the best stereo photo.
+When I capture sequential left/right photos, I have to be aware of my subject distance and background to obtain an ideal interaxial spacing between shots. Sometimes I use multiple exposure in the camera to judge the camera spacing I need for good stereo. With a twin camera rig, the camera spacing determines how far from the subject I should be to get the best stereo photo.
 
-What if I used a single video (trucking) capture and picked out the left and right eye frames with images that give good stereo results. This way I do not need to be too concerned with my sequential shot camera spacing, I can select left/right view frames with good disparity for my subject. The major issue when shooting the video is getting smooth camera movement in a straight line to minimize poor stereo artifacts in the resulting 3D photo, making the photo uncomfortable to view. Otherwise I would need better tools for stereo photo alignment.
+I began experimenting with 3D sequential capture from a single 2D left to right video (trucking) and then picked out the left and right eye frames with images that gave good stereo results. This way I do not need to be too concerned with my sequential shot camera spacing, I could select left/right view frames with good disparity for my subject. 
 
-I could not find an existing application to extract acceptable video frames for stereo viewing that would meet my needs, 
-so I wrote my own application and made it open source here. I was able to experiment and learn more about stereo photography writing this application.
+The major issue when shooting the video is getting smooth camera movement in a straight line to minimize poor stereo artifacts in the resulting 3D photo, making the photo uncomfortable to view. Otherwise I would need better tools for stereo photo alignment.
+
+I could not find an existing application to extract acceptable and view video frames for stereo, 
+so I wrote my own application and made it open source here. 
 
 ## The Application
-This Java application for Windows, written in the Processing language/framework SDK, assists with ___manual extraction___ of left and right eye image pairs from motion videos that truck left to right. Multiple groups of extracted images can be saved for 3D stereo photos, 4V quad stereo photos displayable on a Leia Lumpad glasses free 3D tablet display, and photo collections for creating 3D lenticular images. 
+This Java application for Windows, written in the Processing Java language/framework SDK, assists with ___manual extraction___ of left and right eye image pairs from motion videos that truck left to right. Multiple groups of extracted images can be saved for 3D stereo photos, 4V quad stereo photos displayable on a Leia Lumpad glasses free 3D tablet display, and photo collections for creating 3D lenticular images. 
 
 The app requires a truck motion video that capture static scences of stationary subjects for 3D viewing after image extraction. The motion video contains multiple sequential image captures of left and right views without determining precise camera interaxial distances for the best stereo image capture based on the camera distance from the subject and background. The app aids to setting the best displacement between left and right eye views for comfortable 3D stereo viewing. 
  
@@ -27,30 +29,44 @@ Currently the size of the extracted saved photos is the size of the display wind
 
 So far I have experimented with mp4 video files with resolutions of 1920x1080, 3840x2160 (4K), and 7680x4320 (8K) pixels. The 8K video files are noticibly slow reads on my computer, almost to the point of being not practical. The source of the videos are my Samsung phone and DSLR camera.
 
-## Building the Application
-When you compile and run the Extract 3D Photo application in the Processing SDK for Windows or Linux (version 3.5.4), you must add the SelectFile contributed library to the Processing SDK. See [Processing Library](https://processing.org/reference/libraries/) information under Contributions.
-
-[SelectFile Library Documentation](https://andrusiv.com/android-select-file/)
-
 ## Application Environment
-The application requires ImageMagick software installed on the computer. It is used for creating side-by-side and 2x2 photo quilts. Windows batch files call ImageMagick for this task.
+The application requires a minimum 1080P display monitor, 1920x1080 pixels for display. I recommend 16 GB of RAM and a fast CPU.
+
+The application requires ImageMagick software installed on your computer. It is used for creating side-by-side and 2x2 photo quilts. Windows batch files call ImageMagick for this task.
+
+## Building the Application
+Building the application requires you to download install the [Processing.org SDK](https://processing.org/). This is free software.
+You compile and run the Extract 3D Photo application in the Processing SDK for Windows or Linux (version 3.5.4) (I have not tried Linux yet).
+
+Create the Windows application exe file with the Processing SDK using its Export Application menu selection. This will create both application.windows32 or application.windows64 folders with the Extract3DPhoto.exe file and supporting libraries.
+
+Note that the application 32-bit version requires installation of Java. The 64-bit version has Java built-in.
 
 ## Running the Application
-The Windows application exe file can be found in either application.windows32_version_1.0 or application.windows64_version_1.0 folders.
-The 32-bit version requires installation of Java.
-The 64-bit version has Java built-in.
+You can run the application from the Processing SDK.
 
-**Important: Remove the _version_1.0 directory suffix from the directory name to be able to run the exe without error when you move this directory to another folder.**
+Here is a link to download a zip file containing the latest version of the application for Windows [application.windows64](https://drive.google.com/file/d/1Ph-0zexFHO-q4oeq6kG9E0ZH3l7FfMlf/view?usp=sharing).
+
+## Application Issues
+1. There is a bug where the application sometimes has trouble reading the frame rate of some video files. This may be caused by the Processing video library that uses an old version GStreamer 1.16.2. The video file I found this error is MP4 4k video at 60 FPS. Until resolved you may want to only use lower FPS videos.
+
+
 
 ## Screenshot
 
 ![Analog screenshot](screenshots/screenshot_anaglyph.jpg)
 
 ## Manual Extraction Tools
-Other tools:
+To be determined.
+
+## 3D Stereo Photo Editing and Alignment Tools
+[Stereo Photo Maker](https://stereo.jpn.org/eng/stphmkr/)
 
 ## Automated Tools
-These automated tools may be of interest:
+These automated tools may be of interest because they capture 3D images sequentially with a single camera:
+
+Camarada - Android app in Google play store at [https://play.google.com/store/apps/details?id=com.aimfire.camarada&hl=en_US&gl=US](https://play.google.com/store/apps/details?id=com.aimfire.camarada&hl=en_US&gl=US)
+
 
 ### Automated Left/Right Frame Extraction Script in Python
 [3D Videos 2 Stereo](https://github.com/lasinger/3DVideos2Stereo)
