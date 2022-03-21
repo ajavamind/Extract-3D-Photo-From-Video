@@ -2,7 +2,7 @@ Key Command List for Extract 3D Photo From Video
 
 H - Show/Remove Keyboard Help Command List
 C - Change color of Text and Crosshairs
-
+ESC - Escape key exits the application. 
 I - Select input video filename
 O - Select output photo folder
 
