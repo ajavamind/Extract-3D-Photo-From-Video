@@ -22,14 +22,13 @@
 
 import processing.video.*;
 
-//boolean DEBUG = false;
-static final boolean DEBUG = true;
-static final String VERSION = "1.1";
+static final boolean DEBUG = false;
+//static final boolean DEBUG = true;
+static final String VERSION = "1.2";
 static final String BUILD = str(1);
 
 String filename = "sample_whale_grapefruit_juice_noaudio.mp4";
-//String filename ="http://";  // TODO
-String filenamePath;
+String filenamePath = filename;
 String name;
 String defaultOutputFolderPath= "output";
 
@@ -92,6 +91,7 @@ String message;
 int msgCounter = 0;
 
 Movie mov;
+
 int leftFrame = 1;
 int leftMiddleFrame = 1;
 int rightMiddleFrame = 1;
@@ -188,20 +188,16 @@ void setup() {
   text("All Rights Reserved", 20, 190);
   text("Loading Sample 4K Video File", 20, 300);
 
-  text("Press Left Mouse Button to Start", 20, 360);
+  text("Press the Mouse Button to Start", 20, 360);
 
   helpLegend = loadStrings(sketchPath("data") + File.separator + "help.txt");
 
-  if (filename.toLowerCase().startsWith("http")) {
-    name = filename.substring(filename.lastIndexOf("/")+1);
-  } else {
-    name = filename.substring(0, filename.indexOf("."));
-  }
+  name = filename.substring(0, filename.indexOf("."));
 
-  //name = filename.substring(0, filename.indexOf(".mp4"));
   if (DEBUG) println("name="+name);
 
   if (DEBUG) println("TEXT_SIZE = "+TEXT_SIZE);
+
   // Load and set the video to play. Setting the video 
   // in play mode is needed so at least one frame is read
   // and we can get duration, size and other information from
@@ -211,6 +207,8 @@ void setup() {
   // Pausing the video at the first frame. 
   rewind(1);
 
+  delay(2000); // To see setup() splash screen up
+  
   selectPhotoOutputFolder();
 }
 
@@ -237,7 +235,7 @@ void draw() {
     // Pausing the video at the first frame. 
     rewind(1);
   }
-
+  
   background(0);
 
   keyUpdate();
@@ -254,11 +252,11 @@ void draw() {
   if (showHelp == INFO) {
     fill(textColor[textColorIndex]);
     textSize(TEXT_SIZE);
-    text("Input: "+filename + " width="+mov.width+" height="+mov.height+" "+mov.frameRate+" FPS", 10, 30);
+    text("Input: "+filenamePath + " width="+mov.width+" height="+mov.height+" "+mov.frameRate+" FPS "+mov.duration()+" seconds", 10, 30);
     //parallax = leftMouseX - rightMouseX;
     text("Output Folder: "+configuration[OUTPUT_FOLDER], 10, 60);
-    text("Frame: "+currentFrame + " / " + (getLength() - 1)+ " Type: "+FRAME_TYPE_STR[frameType]
-      , 10, 90);
+    //text("Frame: "+currentFrame + " / " + (getLength() - 1)+ " Type: "+FRAME_TYPE_STR[frameType], 10, 90);
+    text("Frame: "+getFrame() + " / " + (getLength() - 1)+ " Type: "+FRAME_TYPE_STR[frameType], 10, 90);
 
     String lr = "Parallel L/R  ";
     if (!leftToRight) lr = "Crosseye R/L  ";
@@ -298,6 +296,11 @@ void draw() {
     if (lastMouseX > 0 || lastMouseY > 0 ) {
       drawSpacingCrosshairs(lastMouseX+offsetX, lastMouseY+offsetY, CROSSHAIR_SPACING_PERCENT);
     }
+  }
+
+  if (mov.frameRate == 0.0) {
+    fill(textColor[textColorIndex]);
+    text("Internal Error Reading Video File - Try Shorter Frame Rate File", 30, height/2+120);
   }
 
   // check for message and update time on the screen message counter

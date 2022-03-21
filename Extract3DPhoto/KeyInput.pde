@@ -196,7 +196,7 @@ boolean keyUpdate() {
     lastMouseY = 0;
     break;
   case KEYCODE_TAB:
-    currentFrame += 10;
+    currentFrame = getFrame() + 10;
     offsetX = 0;
     offsetY = 0;
     setFrame(currentFrame);
