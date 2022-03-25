@@ -48,7 +48,7 @@ You can run the application from the Processing SDK.
 Here is a link to download a zip file containing the latest version of the application for Windows [application.windows64](https://drive.google.com/file/d/1Ph-0zexFHO-q4oeq6kG9E0ZH3l7FfMlf/view?usp=sharing).
 
 ## Application Issues
-1. There is a bug where the application sometimes has trouble reading the frame rate of some video files. This may be caused by the Processing video library that uses an old version GStreamer 1.16.2. The video file I found this error is MP4 4k video at 60 FPS. Until resolved you may want to only use lower FPS videos.
+1. There is a bug where the application sometimes has trouble reading the frame rate of some mp4 video files. This may be caused by the Processing video library that uses an old version GStreamer 1.16.2. The video file I found this error was a 4k mp4 video at 60 FPS. I resolved by converting to lower 30 frames per second. I also resolved by using VLC to convert mp4 to mkv file format and keep the same frame rate. When I used MKV file I had to play it and then rewind to get correct width and height of the video.
 
 
 
