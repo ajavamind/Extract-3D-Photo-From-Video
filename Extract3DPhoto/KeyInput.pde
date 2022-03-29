@@ -49,9 +49,9 @@ static final int KEYCODE_Z = 90;
 static final int KEYCODE_LEFT_BRACKET = 91;
 static final int KEYCODE_RIGHT_BRACKET = 93;
 static final int KEYCODE_DEL = 127;
-static final int KEYCODE_MEDIA_NEXT = 87;
-static final int KEYCODE_MEDIA_PLAY_PAUSE = 85;
-static final int KEYCODE_MEDIA_PREVIOUS = 88;
+//static final int KEYCODE_MEDIA_NEXT = 87;
+//static final int KEYCODE_MEDIA_PLAY_PAUSE = 85;
+//static final int KEYCODE_MEDIA_PREVIOUS = 88;
 static final int KEYCODE_PAGE_DOWN = 93;
 static final int KEYCODE_PAGE_UP = 92;
 static final int KEYCODE_PLAY = 126;
@@ -87,6 +87,10 @@ boolean keyUpdate() {
 
   boolean common = true;
   switch(lastKeyCode) {
+  case KEYCODE_Q:
+  case KEYCODE_ESCAPE:
+    exit();
+    break;
   case KEYCODE_G:
     // toggle crosshair display
     showCrosshair = !showCrosshair;
@@ -129,9 +133,9 @@ boolean keyUpdate() {
       screen = makeAnaglyph(true);
       if (screen != null) {
         if (leftToRight) {
-          savePhoto(name+"_"+counter+"_"+leftFrame+"L"+rightFrame+"R"+"_ana"+outputFileType, "", false, false);
+          savePhoto(name+"_"+convert(counter)+"_"+convert(leftFrame)+"L"+convert(rightFrame)+"R"+"_ana"+outputFileType, "", false, false);
         } else {
-          savePhoto(name+"_"+counter+"_"+rightFrame+"L"+leftFrame+"R"+"_ana"+outputFileType, "", false, false);
+          savePhoto(name+"_"+convert(counter)+"_"+convert(rightFrame)+"L"+convert(leftFrame)+"R"+"_ana"+outputFileType, "", false, false);
         }
       }
     } else {
@@ -158,9 +162,9 @@ boolean keyUpdate() {
     }
     screen = makeAnaglyph(true);
     if (leftToRight) {
-      savePhoto(name+"_"+counter+"_"+leftFrame+"L"+rightFrame+"R"+"_ana"+outputFileType, "", false, false);
+      savePhoto(name+"_"+convert(counter)+"_"+convert(leftFrame)+"L"+convert(rightFrame)+"R"+"_ana"+outputFileType, "", false, false);
     } else {
-      savePhoto(name+"_"+counter+"_"+rightFrame+"L"+leftFrame+"R"+"_ana"+outputFileType, "", false, false);
+      savePhoto(name+"_"+convert(counter)+"_"+convert(rightFrame)+"L"+convert(leftFrame)+"R"+"_ana"+outputFileType, "", false, false);
     }
     lastKey = 0;
     lastKeyCode = 0;
@@ -173,16 +177,16 @@ boolean keyUpdate() {
       currentFrame--;
       offsetX = 0;
       offsetY = 0;
-      setFrame(currentFrame);
+      setFrame(movie, currentFrame, true);
       frameType = FRAME_TYPE_MISSING;
     }
     break;
   case KEYCODE_SPACE:
-    if (currentFrame < getLength() - 1) {
+    if (currentFrame < getLength(movie) - 1) {
       currentFrame++;
       offsetX = 0;
       offsetY = 0;
-      setFrame(currentFrame);
+      setFrame(movie, currentFrame, true);
       frameType = FRAME_TYPE_MISSING;
     }
     break;
@@ -190,16 +194,16 @@ boolean keyUpdate() {
     currentFrame = 1;
     offsetX = 0;
     offsetY = 0;
-    setFrame(currentFrame);
+    setFrame(movie, currentFrame, true);
     frameType = FRAME_TYPE_MISSING;
     lastMouseX = 0;
     lastMouseY = 0;
     break;
   case KEYCODE_TAB:
-    currentFrame = getFrame() + 10;
+    currentFrame = getFrame(movie) + 10;
     offsetX = 0;
     offsetY = 0;
-    setFrame(currentFrame);
+    setFrame(movie, currentFrame, true);
     frameType = FRAME_TYPE_MISSING;
     break;
   case LEFT:
@@ -239,7 +243,7 @@ boolean keyUpdate() {
       offsetX += saveMouseX - lastMouseX;
       offsetY += saveMouseY - lastMouseY;
       updated = true;
-      //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+      //savePhoto(name+"_"+counter+"_"+getFrame(movie)+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     } else {
       displayMessage("Not Lenticular Mode.", 30);
     }
@@ -249,10 +253,24 @@ boolean keyUpdate() {
     modeString = MODE_STR[mode];
     resetSavedFn();
     break;
-  case KEYCODE_V: // set mode to 4V for Leia LumePad 3D Tablet
+  case KEYCODE_U: // set mode to 4V for Leia LumePad 3D Tablet
     mode = MODE_4V;
     modeString = MODE_STR[mode];
     resetSavedFn();
+    break;
+  case KEYCODE_V: // save 3D SBS video 
+    if (mode == MODE_3D && lrFrameDiff > 0) {
+      saveVideo = SETUP_VIDEO;
+    } else {
+      displayMessage("Cannot save 3D video, not in 3D mode.", 60);
+    }
+    break;
+  case KEYCODE_E: // save 3D L/R frames as separate files 
+    if (mode == MODE_3D && lrFrameDiff > 0) {
+      saveLRphoto = SETUP_READ;
+    } else {
+      displayMessage("Cannot save 3D photos, not in 3D mode.", 60);
+    }
     break;
   case KEYCODE_Y: // set mode to Single and save
     mode = MODE_SINGLE;
@@ -285,14 +303,14 @@ boolean keyUpdate() {
     selectPhotoOutputFolder();
     break;
   case KEYCODE_K:
-    savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "F", false, true);
+    savePhoto(name+"_"+convert(counter)+"_"+convert(getFrame(movie))+FRAME_TYPE_STR[frameType]+outputFileType, "F", false, true);
     break;
   case KEYCODE_S:
     //launch(sketchPath("")+"makeSBS.bat");
     if (mode == MODE_3D) {
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("data") + File.separator + "makeSBS.bat");
       launch(sketchPath("data") + File.separator + "makeSBS.bat "+ saved3DFn[0] + " " + saved3DFn[1] + " "+ 
-      configuration[OUTPUT_FOLDER]+File.separator +name + "_"+counter+"_"+leftFrame+"L"+rightFrame+"R");
+        configuration[OUTPUT_FOLDER]+File.separator +name + "_"+counter+"_"+leftFrame+"L"+rightFrame+"R");
       displayMessage("Save SBS 3D Photo", 30);
     } else if (mode == MODE_4V) {
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("data") + File.separator +"make4v.bat");
@@ -311,11 +329,11 @@ boolean keyUpdate() {
   case KEYCODE_L:
     if (mode == MODE_3D) {
       frameType = FRAME_TYPE_LEFT;
-      leftFrame = currentFrame;
+      leftFrame = getFrame(movie);
       leftMouseX = lastMouseX;
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_LEFT_LEFT;
-      leftFrame = currentFrame;
+      leftFrame = getFrame(movie);
     } else {
       break;
     }
@@ -323,7 +341,7 @@ boolean keyUpdate() {
     saveMouseY = lastMouseY;
     saveFrameType = frameType;
     updated = true;
-    //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+    //savePhoto(name+"_"+counter+"_"+getFrame(movie)+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     break;
   case KEYCODE_M:
     if (mode == MODE_4V) {
@@ -331,8 +349,8 @@ boolean keyUpdate() {
       offsetX += saveMouseX - lastMouseX;
       offsetY += saveMouseY - lastMouseY;
       updated = true;
-      leftMiddleFrame = currentFrame;
-      //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+      leftMiddleFrame = getFrame(movie);
+      //savePhoto(name+"_"+counter+"_"+getFrame(movie)+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
     break;
   case KEYCODE_N:
@@ -340,19 +358,20 @@ boolean keyUpdate() {
       frameType = FRAME_TYPE_RIGHT_MIDDLE;
       offsetX += saveMouseX - lastMouseX;
       offsetY += saveMouseY - lastMouseY;
-      rightMiddleFrame = currentFrame;
+      rightMiddleFrame = getFrame(movie);
       updated = true;
-      //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+      //savePhoto(name+"_"+counter+"_"+getFrame(movie)+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
     break;
   case KEYCODE_R:
     if (mode == MODE_3D) {
       frameType = FRAME_TYPE_RIGHT;
-      rightFrame = currentFrame;
+      rightFrame = getFrame(movie);
       rightMouseX = lastMouseX;
+      lrFrameDiff = rightFrame - leftFrame + 1;
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_RIGHT_RIGHT;
-      rightFrame = currentFrame;
+      rightFrame = getFrame(movie);
     } else {
       break;
     }
@@ -364,7 +383,7 @@ boolean keyUpdate() {
       offsetY = saveMouseY - lastMouseY;
       updated = true;
     }
-    //savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+    //savePhoto(name+"_"+counter+"_"+getFrame(movie)+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     break;
   case KEYCODE_PLUS:
     counter++;
@@ -377,7 +396,7 @@ boolean keyUpdate() {
     }
     break;
     // play input video file
-  case KEYCODE_MEDIA_PLAY_PAUSE:
+    //case KEYCODE_MEDIA_PLAY_PAUSE:
   case KEYCODE_PLAY:
   case KEYCODE_ENTER:
     play();

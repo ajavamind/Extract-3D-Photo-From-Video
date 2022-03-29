@@ -2,13 +2,13 @@ Key Command List for Extract 3D Photo From Video
 
 H - Show/Remove Keyboard Help Command List
 C - Change color of Text and Crosshairs
-ESC - Escape key exits the application. 
+Q or ESC - Exit the application. 
 I - Select input video filename
 O - Select output photo folder
 
 Y - Single Mode. Saves single frame without a suffix
 D - 3D Mode. Save _L and _R frames only
-V - 4V Mode. Save suffix _LL _LM _RM _RR frames for LumePad 3D Tablet
+U - 4V Mode. Save suffix _LL _LM _RM _RR frames for LumePad 3D Tablet
 T - Lenticular Mode. Save frames with suffix _00 to _09
 
 Space     - Next Video Frame
@@ -34,10 +34,10 @@ R         - Set Right Frame as _R (3D mode) or _RR (4V mode)
           - Right Frame with suffix _R (3D mode) or _RR (4V mode)
           - Lenticular Frame with suffix _00 to _09 (Lenticular mode)
 		  
-K         - Save Frame at same resolution as video without offsets
-			Align with Stereo Photo Maker or other software
-			
-S		  - save 3D SBS, 4V, or Quilt file using Windows batch file
+K         - Save Unaligned Frame at same resolution as input video
+S		  - Save 3D SBS, 4V, or Quilt file using Windows batch file
+V         - Save L/R Frame Difference Video as 3D SBS mp4 file No Alignment
+E         - Save L/R Frame Difference L/R full resolution files No Alignment
 
 +         - Advance Group filename counter
 -         - Reduce Group filename counter

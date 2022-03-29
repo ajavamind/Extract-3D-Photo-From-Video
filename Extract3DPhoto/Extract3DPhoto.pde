@@ -1,4 +1,3 @@
-
 /**
  * Extract 3D and 4V (Leia LumePad format) Photos from sequential frames in a Video File 
  * The video file is a left to right capture sequence creating by trucking the camera.
@@ -22,9 +21,9 @@
 
 import processing.video.*;
 
-static final boolean DEBUG = false;
-//static final boolean DEBUG = true;
-static final String VERSION = "1.2";
+//static final boolean DEBUG = false;
+static final boolean DEBUG = true;
+static final String VERSION = "1.3"; // bug fixes and add save 3D SBS video
 static final String BUILD = str(1);
 
 String filename = "sample_whale_grapefruit_juice_noaudio.mp4";
@@ -90,13 +89,17 @@ String outputFileType = JPEG;
 String message;
 int msgCounter = 0;
 
-Movie mov;
+Movie movie;
 
-int leftFrame = 1;
-int leftMiddleFrame = 1;
-int rightMiddleFrame = 1;
-int rightFrame = 1;
-int currentFrame = 1;
+int leftFrame = 0;
+int leftMiddleFrame = 0;
+int rightMiddleFrame = 0;
+int rightFrame = 0;
+int currentFrame = 0;
+int lrFrameDiff = 0;
+float movieAspectRatio;
+
+// Font and Text size
 int TEXT_SIZE;  // in pixels
 int TEXT_SIZE2;  // in pixels
 
@@ -177,6 +180,9 @@ void settings() {
 
 void setup() {
   background(0);
+  // set Landscape orientation
+  orientation(LANDSCAPE); 
+
   TEXT_SIZE = width/80;
   TEXT_SIZE2 = width/120;
   fill(255);
@@ -202,14 +208,17 @@ void setup() {
   // in play mode is needed so at least one frame is read
   // and we can get duration, size and other information from
   // the video stream. 
-  mov = new Movie(this, filename);
+  movie = new Movie(this, filename);
 
   // Pausing the video at the first frame. 
   rewind(1);
 
   delay(2000); // To see setup() splash screen up
-  
+
   selectPhotoOutputFolder();
+
+  movieAspectRatio = (float)movie.width / (float)movie.height;
+  if (DEBUG) println("movieAspectRatio="+movieAspectRatio);
 }
 
 void movieEvent(Movie m) {
@@ -218,54 +227,83 @@ void movieEvent(Movie m) {
 
 void rewind(int frameNo) {
   currentFrame = frameNo;
-  mov.play();
-  mov.jump(0);
-  mov.pause();
-  setFrame(currentFrame);
+  movie.play();
+  movie.jump(0);
+  movie.pause();
+  setFrame(movie, currentFrame, true);
 }
 
 void draw() {
   if (newVideo) {
     newVideo = false;
-    mov.stop();
-    mov.dispose();
+    movie.stop();
+    movie.dispose();
     name = filename.substring(0, filename.toLowerCase().lastIndexOf("."));
-    mov = new Movie(this, filenamePath);
-
+    movie = new Movie(this, filenamePath);
+    lrFrameDiff = 0;
     // Pausing the video at the first frame. 
     rewind(1);
+    movieAspectRatio = (float)movie.width / (float)movie.height;
+    if (DEBUG) println("movieAspectRatio="+movieAspectRatio);
+  } else if (saveVideo > NO_VIDEO) {
+    if (saveVideo == SETUP_VIDEO) {
+      videoSetup();
+      saveVideo = WRITE_VIDEO;
+    } 
+    if (saveVideo == WRITE_VIDEO) {
+      videoDraw();
+      return;
+    } else if (saveVideo == FINISHED_VIDEO) {
+      saveVideo = NO_VIDEO;
+    }
+  } else if (saveLRphoto > NO_LR) {
+    if (saveLRphoto == SETUP_READ) {
+      lrPhotoSetup();
+      saveLRphoto = WRITE_LR;
+    } 
+    if (saveLRphoto == WRITE_LR) {
+      lrPhotoDraw();
+      return;
+    } else if (saveLRphoto == FINISHED_WRITE_LR) {
+      saveLRphoto = NO_LR;
+    }
   }
-  
+
+
   background(0);
 
   keyUpdate();
   if (screen != null) {
     image(screen, 0, 0, screen.width, screen.height);
   } else {
-    image(mov, offsetX, offsetY, width, height);
+    image(movie, offsetX, offsetY, float(height)*movieAspectRatio, height);
     if (updated) {
       updated = false;
-      savePhoto(name+"_"+counter+"_"+currentFrame+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+      savePhoto(name+"_"+convert(counter)+"_"+getFrame(movie)+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
   }
 
   if (showHelp == INFO) {
     fill(textColor[textColorIndex]);
     textSize(TEXT_SIZE);
-    text("Input: "+filenamePath + " width="+mov.width+" height="+mov.height+" "+mov.frameRate+" FPS "+mov.duration()+" seconds", 10, 30);
+    text("Type H To Toggle Keyboard Command List", 10, 30);
+    text("Input: "+filenamePath + " width="+movie.width+" height="+movie.height+" "+movie.sourceFrameRate+" FPS "+movie.duration()+" seconds", 10, 60);
     //parallax = leftMouseX - rightMouseX;
-    text("Output Folder: "+configuration[OUTPUT_FOLDER], 10, 60);
-    //text("Frame: "+currentFrame + " / " + (getLength() - 1)+ " Type: "+FRAME_TYPE_STR[frameType], 10, 90);
-    text("Frame: "+getFrame() + " / " + (getLength() - 1)+ " Type: "+FRAME_TYPE_STR[frameType], 10, 90);
+    text("Output Folder: "+configuration[OUTPUT_FOLDER], 10, 90);
+    //text("Frame: "+currentFrame + " / " + (getLength() - 1)+ " Type: "+FRAME_TYPE_STR[frameType], 10, 120);
+    text("Frame: "+getFrame(movie) + " / " + (getLength(movie) - 1)+ " Type: "+FRAME_TYPE_STR[frameType], 10, 120);
 
     String lr = "Parallel L/R  ";
     if (!leftToRight) lr = "Crosseye R/L  ";
-    text(lr + "Mode: "+ modeString, 10, 120);
+    if (mode == MODE_3D) {
+      text(lr + "Mode: " + modeString + " L/R Frame Diff: " + lrFrameDiff, 10, 150);
+    } else {
+      text(lr + "Mode: "+ modeString, 10, 150);
+    }
 
-    text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 150);
+    text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 180);
     //text("Output: " +name+"_"+counter+"_"+currentFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
-    text("Group Counter: "+counter + " offsetX="+offsetX + " offsetY="+offsetY, 10, 180);
-    text("Type H to Toggle Key Command Help", 10, 210);
+    text("Group Counter: "+counter + " offsetX="+offsetX + " offsetY="+offsetY, 10, 210);
     text("Saved Files for Group "+counter+":", 10, 240);
 
     if (mode == MODE_3D) {
@@ -298,9 +336,9 @@ void draw() {
     }
   }
 
-  if (mov.frameRate == 0.0) {
+  if (movie.sourceFrameRate == 0.0) {
     fill(textColor[textColorIndex]);
-    text("Internal Error Reading Video File - Try Shorter Frame Rate File", 30, height/2+120);
+    text("Internal Error Reading Video File - Convert to MKV or Lower Frame Rate", 30, height/2+120);
   }
 
   // check for message and update time on the screen message counter
@@ -325,78 +363,48 @@ void displayMessage(String msg, int counter) {
   msgCounter = counter;
 }
 
-void savePhoto(String fn, String prefix, boolean saveName, boolean highRes) {
-  String lfn = configuration[OUTPUT_FOLDER]+File.separator+prefix+fn;
-  if (saveName) {
-    if (mode == MODE_SINGLE) {
-      savedSingleFn = lfn;
-    } else if (frameType == FRAME_TYPE_MISSING) {
-      displayMessage("Frame Type Not Set", 60);
-      return;
-    }
-
-    if (mode == MODE_3D) {
-      saved3DFn[frameType-FRAME_TYPE_LEFT] = lfn;
-    } else if (mode == MODE_4V) {
-      saved4VFn[frameType - FRAME_TYPE_LEFT_LEFT] = lfn;
-    } else if (mode == MODE_LENTICULAR) {
-      savedLentFn[frameType - FRAME_TYPE_BASE_LENTICULAR] = lfn;
-    }
-    save(lfn);
-  } else {
-    if (highRes) {
-      // highest resolution but NO shift vertical or horizontal for alignment of stereo window
-      PImage tmp = mov.copy();
-      tmp.save(lfn);
-      displayMessage("Saved original resolution: "+lfn, 30);
-    } else {
-      savedAnaglyphFn = lfn;
-      displayMessage("Saved: "+lfn, 30);
-      screen.save(lfn);
-    }
-  }
-
-  if (DEBUG) println("Save Photo: " + lfn);
-  //displayMessage(lfn, 60);
+int getFrame(Movie movie) {    
+  return ceil(movie.time() * 30) - 1;
 }
 
-int getFrame() {    
-  return ceil(mov.time() * 30) - 1;
-}
-
-void setFrame(int n) {
-  if (DEBUG) println("setFrame("+n+")");
-  mov.play();
+void setFrame(Movie movie, int n, boolean doPlay) {
+  if (DEBUG) println(movie.toString()+ " setFrame("+n+") " + doPlay);
+  movie.play();
 
   // The duration of a single frame:
-  float frameDuration = 1.0 / mov.frameRate;
+  float frameDuration = 1.0 / movie.sourceFrameRate;
 
   // We move to the middle of the frame by adding 0.5:
   float where = (n + 0.5) * frameDuration; 
 
   // Taking into account border effects:
-  float diff = mov.duration() - where;
+  float diff = movie.duration() - where;
   if (diff < 0) {
     where += diff - 0.25 * frameDuration;
   }
 
-  mov.jump(where);
-  mov.pause();
-  mov.play();
-  mov.pause();
+  movie.jump(where);
+  movie.pause();
+  if (doPlay) {
+    movie.play();   // Verify TODO for video save
+    movie.pause();  // Verify TODO for video save
+  }
 }  
 
-int getLength() {
-  return int(mov.duration() * mov.frameRate);
+/**
+ * Get length of movie as frame count
+ */
+int getLength(Movie mov) {
+  return int(mov.duration() * mov.sourceFrameRate);
 }
 
 void play() {
-  mov.speed(0.1);
-  if (mov.isPlaying()) {
-    mov.pause();
-    currentFrame = getFrame();
+  movie.speed(0.1);
+  if (movie.isPlaying()) {
+    movie.pause();
+    currentFrame = getFrame(movie);
   } else {
-    mov.play();
+    movie.play();
   }
 }
 
