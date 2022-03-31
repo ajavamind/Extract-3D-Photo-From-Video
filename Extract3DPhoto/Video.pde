@@ -28,8 +28,8 @@ void videoSetup() {
   rMovie = new Movie(this, filenamePath);
   videoSetup(lMovie);
   videoSetup(rMovie);
-  setFrame(lMovie, leftFrame, true);  
-  setFrame(rMovie, rightFrame, true);  
+  setFrame(lMovie, leftFrame);  
+  setFrame(rMovie, rightFrame);  
 
   String vFile = configuration[OUTPUT_FOLDER]+File.separator+name+"_"+counter+"_2x1"+outputVideoType;
   if (DEBUG) println("Create video file " + vFile);
@@ -81,8 +81,8 @@ void videoDraw() {
 
   leftFrame++;
   rightFrame++;
-  setFrame(lMovie, leftFrame, false);  
-  setFrame(rMovie, rightFrame, false);  
+  setFrame(lMovie, leftFrame);  
+  setFrame(rMovie, rightFrame);  
   if (rightFrame >getLength(rMovie)) {
     if (DEBUG) println("Video saved "+ videoExport.toString());
     videoExport.endMovie();

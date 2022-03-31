@@ -16,13 +16,13 @@
  * The video frame read technique estimates the frame number using the framerate
  * of the movie file, so it might not be exact for every frame.
  
- * Key commands saves left and right eye frames for a stereo image.
+ * Keyboard commands saves left and right eye frames for a stereo image.
  */
 
 import processing.video.*;
 
-//static final boolean DEBUG = false;
-static final boolean DEBUG = true;
+static final boolean DEBUG = false;
+//static final boolean DEBUG = true;
 static final String VERSION = "1.3"; // bug fixes and add save 3D SBS video
 static final String BUILD = str(1);
 
@@ -211,7 +211,7 @@ void setup() {
   movie = new Movie(this, filename);
 
   // Pausing the video at the first frame. 
-  rewind(1);
+  rewind(0);
 
   delay(2000); // To see setup() splash screen up
 
@@ -230,7 +230,7 @@ void rewind(int frameNo) {
   movie.play();
   movie.jump(0);
   movie.pause();
-  setFrame(movie, currentFrame, true);
+  setFrame(movie, currentFrame);
 }
 
 void draw() {
@@ -242,7 +242,7 @@ void draw() {
     movie = new Movie(this, filenamePath);
     lrFrameDiff = 0;
     // Pausing the video at the first frame. 
-    rewind(1);
+    rewind(0);
     movieAspectRatio = (float)movie.width / (float)movie.height;
     if (DEBUG) println("movieAspectRatio="+movieAspectRatio);
   } else if (saveVideo > NO_VIDEO) {
@@ -258,17 +258,23 @@ void draw() {
     }
   } else if (saveLRphoto > NO_LR) {
     if (saveLRphoto == SETUP_READ) {
-      lrPhotoSetup();
+      //lrPhotoSetup();
+      ePhotoSetup();
       saveLRphoto = WRITE_LR;
     } 
     if (saveLRphoto == WRITE_LR) {
-      lrPhotoDraw();
-      return;
+      //lrPhotoDraw();
+      ePhotoDraw();
+      if (lastKeyCode == KEYCODE_Q) {
+        lastKeyCode = KEYCODE_Z;  // do rewind
+        saveLRphoto = NO_LR;
+      } else {
+        return;
+      }
     } else if (saveLRphoto == FINISHED_WRITE_LR) {
       saveLRphoto = NO_LR;
     }
   }
-
 
   background(0);
 
@@ -279,7 +285,7 @@ void draw() {
     image(movie, offsetX, offsetY, float(height)*movieAspectRatio, height);
     if (updated) {
       updated = false;
-      savePhoto(name+"_"+convert(counter)+"_"+getFrame(movie)+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
+      savePhoto(name+"_"+convert(counter)+"_"+convert(getFrame(movie))+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     }
   }
 
@@ -304,7 +310,7 @@ void draw() {
     text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 180);
     //text("Output: " +name+"_"+counter+"_"+currentFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
     text("Group Counter: "+counter + " offsetX="+offsetX + " offsetY="+offsetY, 10, 210);
-    text("Saved Files for Group "+counter+":", 10, 240);
+    text("Save "+ outputFileType + " Files for Group "+counter+":", 10, 240);
 
     if (mode == MODE_3D) {
       for (int i=0; i<NUM_3D; i++) {
@@ -364,11 +370,15 @@ void displayMessage(String msg, int counter) {
 }
 
 int getFrame(Movie movie) {    
-  return ceil(movie.time() * 30) - 1;
+  float frameDuration = 1.0 / movie.sourceFrameRate;
+  float mTime = movie.time();
+  if (mTime > frameDuration/2.0) {
+    return ceil(movie.time() * movie.sourceFrameRate);
+  } 
+  return 0;
 }
 
-void setFrame(Movie movie, int n, boolean doPlay) {
-  if (DEBUG) println(movie.toString()+ " setFrame("+n+") " + doPlay);
+void setFrame(Movie movie, int n) {
   movie.play();
 
   // The duration of a single frame:
@@ -381,14 +391,12 @@ void setFrame(Movie movie, int n, boolean doPlay) {
   float diff = movie.duration() - where;
   if (diff < 0) {
     where += diff - 0.25 * frameDuration;
+    if (DEBUG) println("where="+where);
   }
-
+  if (n == 0) where = 0.0;
   movie.jump(where);
   movie.pause();
-  if (doPlay) {
-    movie.play();   // Verify TODO for video save
-    movie.pause();  // Verify TODO for video save
-  }
+  if (DEBUG) println("setFrame("+n+") frameDuration="+frameDuration +" where="+where +" " );
 }  
 
 /**

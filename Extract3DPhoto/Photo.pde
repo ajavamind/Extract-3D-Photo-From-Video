@@ -8,6 +8,45 @@ int saveLRphoto = NO_LR;
 
 String leftFile;
 String rightFile;
+String eFile;
+int eFrame = 0;
+
+// Extract Photos from Video File
+void ePhotoSetup() {
+  // Load and set the video to play. Setting the video 
+  // in play mode is needed so at least one frame is read
+  // and we can get duration, size and other information from
+  // the video stream. 
+  eFrame = 0;
+  setFrame(movie, eFrame);
+}
+
+void ePhotoDraw() {
+  background(0);
+  fill(0);
+
+  image(movie, 0, (height-(width/2)/movieAspectRatio)/2, (width/2), (width/2)/movieAspectRatio);
+  fill(255);
+  text(getFrame(movie) + " / " + (getLength(movie)-1), 0, height-20);
+  eFrame = getFrame(movie);
+  eFile = configuration[OUTPUT_FOLDER]+File.separator+name+"_F"+convert(eFrame)+outputFileType;
+  if (DEBUG) println("Create photo files " + eFile);
+
+  PImage tmp = movie.copy();
+  tmp.save(eFile);
+  eFrame++;
+  //leftFrame++;
+  //rightFrame++;
+  //setFrame(movie, leftFrame);  
+  //if (rightFrame >getLength(rMovie)) {
+  if (eFrame > getLength(movie)) {
+    if (DEBUG) println("LR Photos saved ");
+    saveLRphoto = FINISHED_WRITE_LR;
+    displayMessage("Finished extracting frame photos from video.", 60);
+  } else {
+    setFrame(movie, eFrame);
+  }
+}
 
 void lrPhotoSetup() {
   // Load and set the video to play. Setting the video 
@@ -18,8 +57,8 @@ void lrPhotoSetup() {
   rMovie = new Movie(this, filenamePath);
   videoSetup(lMovie);
   videoSetup(rMovie);
-  setFrame(lMovie, leftFrame, true);  
-  setFrame(rMovie, rightFrame, true);
+  setFrame(lMovie, leftFrame);  
+  setFrame(rMovie, rightFrame);
 }
 
 void lrPhotoDraw() {
@@ -29,9 +68,9 @@ void lrPhotoDraw() {
   image(lMovie, 0, (height-(width/2)/movieAspectRatio)/2, (width/2), (width/2)/movieAspectRatio);
   image(rMovie, width/2, (height-(width/2)/movieAspectRatio)/2, (width/2), (width/2)/movieAspectRatio);   
   //if (DEBUG) {
-    fill(255);
-    text(getFrame(lMovie) + " / " + (getLength(lMovie)-1), 0, height-20);
-    text(getFrame(rMovie) + " / " + (getLength(rMovie)-1), width/2, height-20);
+  fill(255);
+  text(getFrame(lMovie) + " / " + (getLength(lMovie)-1), 0, height-20);
+  text(getFrame(rMovie) + " / " + (getLength(rMovie)-1), width/2, height-20);
   //}
 
   leftFile = configuration[OUTPUT_FOLDER]+File.separator+name+"_"+counter+"_F"+convert(leftFrame)+"_"+convert(rightFrame)+"_L"+outputFileType;
@@ -46,8 +85,8 @@ void lrPhotoDraw() {
 
   leftFrame++;
   rightFrame++;
-  setFrame(lMovie, leftFrame, false);  
-  setFrame(rMovie, rightFrame, false);  
+  setFrame(lMovie, leftFrame);  
+  setFrame(rMovie, rightFrame);  
   if (rightFrame >getLength(rMovie)) {
     if (DEBUG) println("LR Photos saved ");
     saveLRphoto = FINISHED_WRITE_LR;

@@ -7,7 +7,10 @@ static final int KEYCODE_TAB = 9;
 static final int KEYCODE_ENTER = 10;
 static final int KEYCODE_ESCAPE = 27;
 static final int KEYCODE_SPACE = 32;
+static final int KEYCODE_COMMA = 44;
 static final int KEYCODE_MINUS = 45;
+static final int KEYCODE_PERIOD = 46;
+static final int KEYCODE_SLASH = 47;
 static final int KEYCODE_0 = 48;
 static final int KEYCODE_1 = 49;
 static final int KEYCODE_2 = 50;
@@ -18,8 +21,9 @@ static final int KEYCODE_6 = 54;
 static final int KEYCODE_7 = 55;
 static final int KEYCODE_8 = 56;
 static final int KEYCODE_9 = 57;
+static final int KEYCODE_SEMICOLON = 59;
 static final int KEYCODE_PLUS = 61;
-
+static final int KEYCODE_EQUAL = 61;
 static final int KEYCODE_A = 65;
 static final int KEYCODE_B = 66;
 static final int KEYCODE_C = 67;
@@ -47,6 +51,7 @@ static final int KEYCODE_X = 88;
 static final int KEYCODE_Y = 89;
 static final int KEYCODE_Z = 90;
 static final int KEYCODE_LEFT_BRACKET = 91;
+static final int KEYCODE_BACK_SLASH = 92;
 static final int KEYCODE_RIGHT_BRACKET = 93;
 static final int KEYCODE_DEL = 127;
 //static final int KEYCODE_MEDIA_NEXT = 87;
@@ -101,7 +106,7 @@ boolean keyUpdate() {
       showHelp = INFO;
     }
     break;
-  case KEYCODE_W: // debug output including stereo window parallax offset
+  case KEYCODE_SLASH: // debug output including stereo window parallax offset
     parallax = saveMouseX - rightMouseX;
     if (DEBUG) println("anaglyph=" + anaglyph +" parallax="+parallax);
     if (DEBUG) println("lastMouseX="+lastMouseX+" lastMouseY="+lastMouseY);
@@ -177,7 +182,7 @@ boolean keyUpdate() {
       currentFrame--;
       offsetX = 0;
       offsetY = 0;
-      setFrame(movie, currentFrame, true);
+      setFrame(movie, currentFrame);
       frameType = FRAME_TYPE_MISSING;
     }
     break;
@@ -186,25 +191,28 @@ boolean keyUpdate() {
       currentFrame++;
       offsetX = 0;
       offsetY = 0;
-      setFrame(movie, currentFrame, true);
+      setFrame(movie, currentFrame);
       frameType = FRAME_TYPE_MISSING;
     }
     break;
-  case KEYCODE_Z:
-    currentFrame = 1;
+  case KEYCODE_TAB:
+    currentFrame = getFrame(movie) + 10;
+    if (currentFrame > getLength(movie)) {
+      currentFrame = getLength(movie) -1;
+    }
     offsetX = 0;
     offsetY = 0;
-    setFrame(movie, currentFrame, true);
+    setFrame(movie, currentFrame);
+    frameType = FRAME_TYPE_MISSING;
+    break;
+  case KEYCODE_Z:
+    currentFrame = 0;
+    offsetX = 0;
+    offsetY = 0;
+    setFrame(movie, currentFrame);
     frameType = FRAME_TYPE_MISSING;
     lastMouseX = 0;
     lastMouseY = 0;
-    break;
-  case KEYCODE_TAB:
-    currentFrame = getFrame(movie) + 10;
-    offsetX = 0;
-    offsetY = 0;
-    setFrame(movie, currentFrame, true);
-    frameType = FRAME_TYPE_MISSING;
     break;
   case LEFT:
     offsetX--;
@@ -266,7 +274,7 @@ boolean keyUpdate() {
     }
     break;
   case KEYCODE_E: // save 3D L/R frames as separate files 
-    if (mode == MODE_3D && lrFrameDiff > 0) {
+    if (mode == MODE_3D) {
       saveLRphoto = SETUP_READ;
     } else {
       displayMessage("Cannot save 3D photos, not in 3D mode.", 60);
@@ -395,10 +403,8 @@ boolean keyUpdate() {
       resetSavedFn();
     }
     break;
-    // play input video file
-    //case KEYCODE_MEDIA_PLAY_PAUSE:
   case KEYCODE_PLAY:
-  case KEYCODE_ENTER:
+  case KEYCODE_ENTER: // play input video file
     play();
     break;
   default:
