@@ -5,7 +5,7 @@
 static final int KEYCODE_BACKSPACE = 8;
 static final int KEYCODE_TAB = 9;
 static final int KEYCODE_ENTER = 10;
-static final int KEYCODE_ESCAPE = 27;
+static final int KEYCODE_ESC = 27;
 static final int KEYCODE_SPACE = 32;
 static final int KEYCODE_COMMA = 44;
 static final int KEYCODE_MINUS = 45;
@@ -77,6 +77,13 @@ void keyReleased() {
 void keyPressed() {
   if (DEBUG) println("key="+key + " keyCode="+keyCode);        
   //if (DEBUG) Log.d(TAG, "key=" + key + " keyCode=" + keyCode);
+  if (key==ESC) {
+    key = 0;
+    keyCode = KEYCODE_ESC;
+    endLogger();
+    //    keyCode = 0;
+    //    return;
+  }
   lastKey = key;
   lastKeyCode = keyCode;
 }
@@ -92,9 +99,15 @@ boolean keyUpdate() {
 
   boolean common = true;
   switch(lastKeyCode) {
-  case KEYCODE_Q:
-  case KEYCODE_ESCAPE:
+  case KEYCODE_ESC:
+    println("ESC exit");
+    movie.stop();
+    movie.dispose();
+    movie = null;
     exit();
+    break;
+  case KEYCODE_Q:
+    println("Q exit");
     break;
   case KEYCODE_G:
     // toggle crosshair display
@@ -154,12 +167,16 @@ boolean keyUpdate() {
       leftToRight = ! leftToRight;
       //} else if (lastKeyCode == LEFT) {
       //  offsetX--;
+      //  updated = true;
       //} else if (lastKeyCode == RIGHT) {
       //  offsetX++;
+      //  updated = true;
       //} else if (lastKeyCode == UP) {
       //  offsetY--;
+      //  updated = true;
       //} else if (lastKeyCode == DOWN) {
       //  offsetY++;
+      //  updated = true;
     } else {
       lastKey = 0;
       lastKeyCode = 0;

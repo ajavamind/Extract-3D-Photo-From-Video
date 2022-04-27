@@ -35,7 +35,7 @@ R         - Set Right Frame as _R (3D mode) or _RR (4V mode)
           - Lenticular Frame with suffix _00 to _09 (Lenticular mode)
 		  
 K         - Save Unaligned Frame at same resolution as input video
-S		  - Save 3D SBS, 4V, or Quilt file using Windows batch file
+S         - Save 3D SBS, 4V, or Quilt file using Windows batch file
 V         - Save L/R Frame Difference Video as 3D SBS mp4 file No Alignment
 E         - Extract All Frames at full resolution from Video input file
 W         - Save SPM slideshow list for L/R Difference Video

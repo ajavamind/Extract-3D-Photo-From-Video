@@ -21,10 +21,10 @@
 
 import processing.video.*;
 
-static final boolean DEBUG = false;
-//static final boolean DEBUG = true;
+//static final boolean DEBUG = false;
+static final boolean DEBUG = true;
 static final String VERSION = "1.3"; // bug fixes and add save 3D SBS video
-static final String BUILD = str(1);
+static final String BUILD = str(2);
 
 String filename = "sample_whale_grapefruit_juice_noaudio.mp4";
 String filenamePath = filename;
@@ -39,6 +39,7 @@ static final int INPUT_FILENAME = 1;  // configuration index for input file path
 static final int INPUT_FILENAME_PATH = 2;
 
 PImage screen;
+int BACKGROUND = 32;
 boolean anaglyph = false;
 boolean newVideo = false;
 boolean leftToRight = true;
@@ -97,11 +98,16 @@ int rightMiddleFrame = 0;
 int rightFrame = 0;
 int currentFrame = 0;
 int lrFrameDiff = 0;
+int savedLeftFrame = 0; // for video output
+int savedRightFrame = 0; // for video output
 float movieAspectRatio;
 
 // Font and Text size
 int TEXT_SIZE;  // in pixels
 int TEXT_SIZE2;  // in pixels
+
+int textDiff = 30;  // text vertucal line position start
+int textOffset = textDiff;
 
 int CROSSHAIR_SIZE = 40;
 float CROSSHAIR_SPACING_PERCENT = 1.00;
@@ -166,7 +172,7 @@ void settings() {
   size(1920, 1080);
   //size(3840, 2160);
   //size(960, 540);
-
+  
   //openFileSystem(); // for Android
   configuration = loadConfig();
   if (configuration == null) {
@@ -179,43 +185,56 @@ void settings() {
 }
 
 void setup() {
-  background(0);
+  beginLogger(this);
+
+  background(BACKGROUND);
   // set Landscape orientation
   orientation(LANDSCAPE); 
-
   TEXT_SIZE = width/80;
   TEXT_SIZE2 = width/120;
+  textDiff = height/36;
+
   fill(255);
   textSize(TEXT_SIZE);
-  surface.setTitle("Extract 3D Photos From a Video File");
-  text("Extract 3D Photos From a Video File", 20, 100);
-  text("Version "+VERSION+ " BUILD " + BUILD + " "+ (DEBUG ? "DEBUG" : ""), 20, 130);
-  text("Copyright 2022 Andy Modla", 20, 160);
-  text("All Rights Reserved", 20, 190);
-  text("Loading Sample 4K Video File", 20, 300);
+  textOffset = textDiff+100;
 
-  text("Press the Mouse Button to Start", 20, 360);
+  surface.setTitle("Extract 3D Photos From a Video File");
+  text("Extract 3D Photos From a Video File", 20, textOffset);
+  textOffset += textDiff;
+  text("Version "+VERSION+ " BUILD " + BUILD + " "+ (DEBUG ? "DEBUG" : ""), 20, textOffset);
+  textOffset += textDiff;
+  text("Copyright 2022 Andy Modla", 20, textOffset);
+  textOffset += textDiff;
+  text("All Rights Reserved", 20, textOffset);
+  textOffset += textDiff+ 3*textDiff;
+  text("Loading Sample 4K Video File", 20, textOffset);
+  textOffset += 4*textDiff;
+  text("Press the Mouse Button to Start", 20, textOffset);
 
   helpLegend = loadStrings(sketchPath("data") + File.separator + "help.txt");
 
   name = filename.substring(0, filename.indexOf("."));
 
   if (DEBUG) println("name="+name);
-
   if (DEBUG) println("TEXT_SIZE = "+TEXT_SIZE);
+
+  selectPhotoOutputFolder();
 
   // Load and set the video to play. Setting the video 
   // in play mode is needed so at least one frame is read
   // and we can get duration, size and other information from
   // the video stream. 
-  movie = new Movie(this, filename);
+  try {
+    movie = new Movie(this, sketchPath("data") + File.separator + filename);
+  } 
+  catch (Error err) {
+    println("Error: "+ err.toString(), 20, textOffset+ 8*textDiff);
+  }
 
   // Pausing the video at the first frame. 
   rewind(0);
 
   delay(2000); // To see setup() splash screen up
-
-  selectPhotoOutputFolder();
 
   movieAspectRatio = (float)movie.width / (float)movie.height;
   if (DEBUG) println("movieAspectRatio="+movieAspectRatio);
@@ -251,14 +270,18 @@ void draw() {
       saveVideo = WRITE_VIDEO;
     } 
     if (saveVideo == WRITE_VIDEO) {
-      videoDraw();
+      boolean stop = false;
+      if (lastKeyCode == KEYCODE_Q) {
+        lastKeyCode = 0;
+        stop = true;
+      }
+      videoDraw(stop);
       return;
     } else if (saveVideo == FINISHED_VIDEO) {
       saveVideo = NO_VIDEO;
     }
   } else if (saveLRphoto > NO_LR) {
     if (saveLRphoto == SETUP_READ) {
-      //lrPhotoSetup();
       ePhotoSetup();
       saveLRphoto = WRITE_LR;
     } 
@@ -276,12 +299,19 @@ void draw() {
     }
   }
 
-  background(0);
+  background(BACKGROUND);
 
   keyUpdate();
   if (screen != null) {
     image(screen, 0, 0, screen.width, screen.height);
   } else {
+    if (movie == null) {
+      fill(textColor[textColorIndex]);
+      textSize(2*TEXT_SIZE);
+      textOffset = textDiff;
+      text("Exit", 10, textOffset);
+      return;
+    }
     image(movie, offsetX, offsetY, float(height)*movieAspectRatio, height);
     if (updated) {
       updated = false;
@@ -292,41 +322,48 @@ void draw() {
   if (showHelp == INFO) {
     fill(textColor[textColorIndex]);
     textSize(TEXT_SIZE);
-    text("Type H To Toggle Keyboard Command List", 10, 30);
-    text("Input: "+filenamePath + " width="+movie.width+" height="+movie.height+" "+movie.sourceFrameRate+" FPS "+movie.duration()+" seconds", 10, 60);
-    //parallax = leftMouseX - rightMouseX;
-    text("Output Folder: "+configuration[OUTPUT_FOLDER], 10, 90);
-    //text("Frame: "+currentFrame + " / " + (getLength() - 1)+ " Type: "+FRAME_TYPE_STR[frameType], 10, 120);
-    text("Frame: "+getFrame(movie) + " / " + (getLength(movie) - 1)+ " Type: "+FRAME_TYPE_STR[frameType], 10, 120);
+    //if (DEBUG) println("textDiff="+textDiff);
+    textOffset = textDiff;
+    text("Type H To Toggle Keyboard Command List", 10, textOffset);
+    textOffset += textDiff;
+    text("Input: "+filenamePath + " width="+movie.width+" height="+movie.height+" "+movie.sourceFrameRate+" FPS "+movie.duration()+" seconds", 10, textOffset);
+    textOffset += textDiff;
+    text("Output Folder: "+configuration[OUTPUT_FOLDER], 10, textOffset);
+    textOffset += textDiff;
+    text("Frame: "+getFrame(movie) + " / " + (getLength(movie) - 1)+ " Type: "+FRAME_TYPE_STR[frameType], 10, textOffset);
+    textOffset += textDiff;
 
     String lr = "Parallel L/R  ";
     if (!leftToRight) lr = "Crosseye R/L  ";
     if (mode == MODE_3D) {
-      text(lr + "Mode: " + modeString + " L/R Frame Diff: " + lrFrameDiff, 10, 150);
+      text(lr + "Mode: " + modeString + " L/R Frame Diff: " + lrFrameDiff, 10, textOffset);
     } else {
-      text(lr + "Mode: "+ modeString, 10, 150);
+      text(lr + "Mode: "+ modeString, 10, textOffset);
     }
+    textOffset += textDiff;
 
-    text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, 180);
-    //text("Output: " +name+"_"+counter+"_"+currentFrame + FRAME_TYPE_STR[frameType] + outputFileType, 10, 150);
-    text("Group Counter: "+counter + " offsetX="+offsetX + " offsetY="+offsetY, 10, 210);
-    text("Save "+ outputFileType + " Files for Group "+counter+":", 10, 240);
+    text("Crosshair Spacing: "+CROSSHAIR_SPACING_PERCENT + "% Frame Width", 10, textOffset);
+    textOffset += textDiff;
+    text("Group Counter: "+counter + " offsetX="+offsetX + " offsetY="+offsetY, 10, textOffset);
+    textOffset += textDiff;
+    text("Save "+ outputFileType + " Files for Group "+counter+":", 10, textOffset);
+    textOffset += textDiff;
 
     if (mode == MODE_3D) {
       for (int i=0; i<NUM_3D; i++) {
-        text(FRAME_3D_LABEL[i]+saved3DFn[i], 10, 270 + i*30);
+        text(FRAME_3D_LABEL[i]+saved3DFn[i], 10, textOffset + i*textDiff);
       }
-      text("Anaglyph "+savedAnaglyphFn, 10, 270 + 2*30);
+      text("Anaglyph "+savedAnaglyphFn, 10, textOffset + 2*textDiff);
     } else if (mode == MODE_4V) {
       for (int i=0; i<NUM_4V; i++) {
-        text(FRAME_4V_LABEL[i]+saved4VFn[i], 10, 270 + i*30);
+        text(FRAME_4V_LABEL[i]+saved4VFn[i], 10, textOffset + i*textDiff);
       }
     } else if (mode == MODE_LENTICULAR) {
       for (int i=0; i<NUM_LENTICULAR; i++) {
-        text(FRAME_LENTICULAR_LABEL[i]+savedLentFn[i], 10, 270 + i*30);
+        text(FRAME_LENTICULAR_LABEL[i]+savedLentFn[i], 10, textOffset + i*textDiff);
       }
     } else if (mode == MODE_SINGLE) {
-      text("SINGLE "+savedSingleFn, 10, 270 );
+      text("SINGLE "+savedSingleFn, 10, textOffset );
     }
   }
   if (showHelp == LEGEND) {
@@ -471,4 +508,22 @@ void drawFeatureCrosshair(float x, float y, float percent) {
   } else {
     text(FRAME_TYPE_STR[saveFrameType], x+CROSSHAIR_SIZE, y-CROSSHAIR_SIZE);
   }
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+static PrintWriter logger;
+
+public static void beginLogger(PApplet pApp) {
+    logger = pApp.createWriter(pApp.sketchPath("data")+File.separator+"extract3Dphoto.log");
+}
+
+public static void println(String msg) {
+  System.out.println(msg);
+  logger.println(msg);
+  logger.flush();
+}
+
+public static void endLogger() {
+  logger.close();
 }
