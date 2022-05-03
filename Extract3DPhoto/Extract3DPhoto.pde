@@ -1,17 +1,17 @@
 /**
- * Extract 3D and 4V (Leia LumePad format) Photos from sequential frames in a Video File 
+ * Extract 3D and 4V (Leia LumePad format) Photos from sequential frames in a Video File
  * The video file is a left to right capture sequence creating by trucking the camera.
  * https://blog.storyblocks.com/video-tutorials/7-basic-camera-movements/
  *
  * Copyright 2022 Andy Modla All Rights Reserved
- * Written in Processing by Andy Modla. 
- * 
+ * Written in Processing by Andy Modla.
+ *
  * The app uses keyboard and mouse click entry. The keyboard issues commands and the mouse generates
  * a crosshair for marking a fixed position in the scene capture in the video.
  * The crosshair should be place on the foreground subject for more positive parallax,
  * and on middle depth subject for negative parallax of the foreground.
  * The app moves through the video one frame at the time using the
- * space and backspace keys. 
+ * space and backspace keys.
  
  * The video frame read technique estimates the frame number using the framerate
  * of the movie file, so it might not be exact for every frame.
@@ -23,20 +23,21 @@ import processing.video.*;
 
 //static final boolean DEBUG = false;
 static final boolean DEBUG = true;
-static final String VERSION = "1.3"; // bug fixes and add save 3D SBS video
+static final String VERSION = "1.4"; // bug fixes and add save 3D SBS video
 static final String BUILD = str(2);
 
 String filename = "sample_whale_grapefruit_juice_noaudio.mp4";
-String filenamePath = filename;
+String filenamePath;
 String name;
 String defaultOutputFolderPath= "output";
 
 String defaultConfigFilename = "default.txt";
-static final int MAX_CONFIG = 3;
+static final int MAX_CONFIG = 4;
 String[] configuration = new String[MAX_CONFIG]; // make space for configuration strings
 static final int OUTPUT_FOLDER = 0;  // configuration index for output folder path
-static final int INPUT_FILENAME = 1;  // configuration index for input file path // TODO
-static final int INPUT_FILENAME_PATH = 2;
+static final int INPUT_FILENAME = 1;  // configuration index for input filename
+static final int INPUT_FILENAME_PATH = 2; // input filename path
+static final int SCREENSHOT_COUNTER = 3;  // next screenshot counter
 
 PImage screen;
 int BACKGROUND = 32;
@@ -71,10 +72,10 @@ static final int FRAME_TYPE_BASE_LENTICULAR = 8;
 static final int FRAME_TYPE_MAX_LENTICULAR = 18;
 
 int frameType = FRAME_TYPE_MISSING;  //FRAME_TYPE_LEFT;
-static final String[] FRAME_TYPE_STR = {"", 
-  "", 
-  "_L", "_R", 
-  "_LL", "_LM", "_RM", "_RR", 
+static final String[] FRAME_TYPE_STR = {"",
+  "",
+  "_L", "_R",
+  "_LL", "_LM", "_RM", "_RR",
   "_00", "_01", "_02", "_03", "_04", "_05", "_06", "_07", "_08", "_09"
 };
 static final String[] FRAME_3D_LABEL = { "Left  ", "Right "};
@@ -123,6 +124,10 @@ static final int LEGEND = 1;
 static final int NO_HELP = 2;
 int showHelp = INFO;
 String[] helpLegend;
+boolean introScreen = true;
+boolean initialized = false;
+boolean screenshot = false;
+int screenshotCounter = 1;
 
 // current frame display shift
 int offsetX = 0;
@@ -165,15 +170,15 @@ void resetSavedFn() {
 }
 
 void settings() {
-  //fullScreen(); // full screen is size of output images
+  fullScreen(); // full screen is size of output images
   // all 16:9 aspect ratios
   // size sets fixed size of output images
   //size(2560, 1440);
-  size(1920, 1080);
+  //size(1920, 1080);
   //size(3840, 2160);
   //size(960, 540);
-  
-  //openFileSystem(); // for Android
+
+  //openFileSystem(); // for Android TBD
   configuration = loadConfig();
   if (configuration == null) {
     configuration = new String[MAX_CONFIG];
@@ -181,7 +186,14 @@ void settings() {
       configuration[i] = "";
     }
     configuration[OUTPUT_FOLDER] = defaultOutputFolderPath;
+    configuration[INPUT_FILENAME] = filename;
+    configuration[INPUT_FILENAME_PATH] = "";
+    configuration[SCREENSHOT_COUNTER] = str(screenshotCounter);
   }
+  screenshotCounter = int(configuration[SCREENSHOT_COUNTER]);
+  filenamePath = configuration[INPUT_FILENAME_PATH];
+
+  saveConfig(configuration);
 }
 
 void setup() {
@@ -189,11 +201,19 @@ void setup() {
 
   background(BACKGROUND);
   // set Landscape orientation
-  orientation(LANDSCAPE); 
+  orientation(LANDSCAPE);
   TEXT_SIZE = width/80;
   TEXT_SIZE2 = width/120;
   textDiff = height/36;
 
+  helpLegend = loadStrings(sketchPath("data") + File.separator + "help.txt");
+  name = configuration[INPUT_FILENAME].substring(0, configuration[INPUT_FILENAME].lastIndexOf("."));
+
+  if (DEBUG) println("name="+name);
+  if (DEBUG) println("TEXT_SIZE = "+TEXT_SIZE);
+}
+
+void introScreen() {
   fill(255);
   textSize(TEXT_SIZE);
   textOffset = textDiff+100;
@@ -209,32 +229,28 @@ void setup() {
   textOffset += textDiff+ 3*textDiff;
   text("Loading Sample 4K Video File", 20, textOffset);
   textOffset += 4*textDiff;
-  text("Press the Mouse Button to Start", 20, textOffset);
+}
 
-  helpLegend = loadStrings(sketchPath("data") + File.separator + "help.txt");
-
-  name = filename.substring(0, filename.indexOf("."));
-
-  if (DEBUG) println("name="+name);
-  if (DEBUG) println("TEXT_SIZE = "+TEXT_SIZE);
-
-  selectPhotoOutputFolder();
-
-  // Load and set the video to play. Setting the video 
+void initMedia() {
+  // Load and set the video to play. Setting the video
   // in play mode is needed so at least one frame is read
   // and we can get duration, size and other information from
-  // the video stream. 
+  // the video stream.
   try {
-    movie = new Movie(this, sketchPath("data") + File.separator + filename);
-  } 
+    if (configuration[INPUT_FILENAME_PATH].equals("")) {
+      movie = new Movie(this, sketchPath("data") + File.separator + filename);
+    } else {
+      movie = new Movie(this, configuration[INPUT_FILENAME_PATH]);
+    }
+  }
   catch (Error err) {
     println("Error: "+ err.toString(), 20, textOffset+ 8*textDiff);
   }
 
-  // Pausing the video at the first frame. 
+  // Pausing the video at the first frame.
   rewind(0);
 
-  delay(2000); // To see setup() splash screen up
+  // delay(2000); // To see setup() splash screen up
 
   movieAspectRatio = (float)movie.width / (float)movie.height;
   if (DEBUG) println("movieAspectRatio="+movieAspectRatio);
@@ -253,6 +269,18 @@ void rewind(int frameNo) {
 }
 
 void draw() {
+  if (introScreen) {
+    introScreen();
+    introScreen = false;
+    return;
+  } else if (!initialized) {
+    initMedia();
+    initialized = true;
+    //text("Press the Mouse Button to Start", 20, textOffset);
+    displayMessage("Press the Mouse Button to Start", 180);
+  }
+  //selectPhotoOutputFolder();
+
   if (newVideo) {
     newVideo = false;
     movie.stop();
@@ -260,15 +288,20 @@ void draw() {
     name = filename.substring(0, filename.toLowerCase().lastIndexOf("."));
     movie = new Movie(this, filenamePath);
     lrFrameDiff = 0;
-    // Pausing the video at the first frame. 
+    // Pausing the video at the first frame.
     rewind(0);
     movieAspectRatio = (float)movie.width / (float)movie.height;
     if (DEBUG) println("movieAspectRatio="+movieAspectRatio);
   } else if (saveVideo > NO_VIDEO) {
     if (saveVideo == SETUP_VIDEO) {
-      videoSetup();
-      saveVideo = WRITE_VIDEO;
-    } 
+      boolean success = videoSetup();
+      if (success) {
+        saveVideo = WRITE_VIDEO;
+      } else {
+        saveVideo = NO_VIDEO;
+        displayMessage("ffmpeg not found! Install and Select ffmpeg.exe", 120);
+      }
+    }
     if (saveVideo == WRITE_VIDEO) {
       boolean stop = false;
       if (lastKeyCode == KEYCODE_Q) {
@@ -284,7 +317,7 @@ void draw() {
     if (saveLRphoto == SETUP_READ) {
       ePhotoSetup();
       saveLRphoto = WRITE_LR;
-    } 
+    }
     if (saveLRphoto == WRITE_LR) {
       //lrPhotoDraw();
       ePhotoDraw();
@@ -392,6 +425,14 @@ void draw() {
     msgCounter--;
     if (msgCounter == 0) message = null;
   }
+
+  if (screenshot) {
+    save(sketchPath("screenshots")+File.separator+"Screenshot_"+screenshotCounter+".png");
+    screenshot = false;
+    screenshotCounter++;
+    configuration[SCREENSHOT_COUNTER] = str(screenshotCounter);
+    saveConfig(configuration);
+  }
 }
 
 void changeTextColor() {
@@ -406,12 +447,12 @@ void displayMessage(String msg, int counter) {
   msgCounter = counter;
 }
 
-int getFrame(Movie movie) {    
+int getFrame(Movie movie) {
   float frameDuration = 1.0 / movie.sourceFrameRate;
   float mTime = movie.time();
   if (mTime > frameDuration/2.0) {
     return ceil(movie.time() * movie.sourceFrameRate);
-  } 
+  }
   return 0;
 }
 
@@ -422,7 +463,7 @@ void setFrame(Movie movie, int n) {
   float frameDuration = 1.0 / movie.sourceFrameRate;
 
   // We move to the middle of the frame by adding 0.5:
-  float where = (n + 0.5) * frameDuration; 
+  float where = (n + 0.5) * frameDuration;
 
   // Taking into account border effects:
   float diff = movie.duration() - where;
@@ -434,7 +475,7 @@ void setFrame(Movie movie, int n) {
   movie.jump(where);
   movie.pause();
   if (DEBUG) println("setFrame("+n+") frameDuration="+frameDuration +" where="+where +" " );
-}  
+}
 
 /**
  * Get length of movie as frame count
@@ -515,7 +556,12 @@ void drawFeatureCrosshair(float x, float y, float percent) {
 static PrintWriter logger;
 
 public static void beginLogger(PApplet pApp) {
-    logger = pApp.createWriter(pApp.sketchPath("data")+File.separator+"extract3Dphoto.log");
+  logger = pApp.createWriter(pApp.sketchPath("log")+File.separator+"extract3Dphoto.log");
+}
+
+public static void log(String msg) {
+  logger.println(msg);
+  logger.flush();
 }
 
 public static void println(String msg) {

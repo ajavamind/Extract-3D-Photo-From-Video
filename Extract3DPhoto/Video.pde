@@ -28,28 +28,24 @@ int saveVideo = NO_VIDEO;
 
 String outputVideoType = ".mp4";  // with H264 codec
 //String outputVideoType = ".avi";  // with H264 codec
+String vFile;
 
-void videoSetup() {
+boolean videoSetup() {
   // Load and set the video to play. Setting the video
   // in play mode is needed so at least one frame is read
   // and we can get duration, size and other information from
   // the video stream.
-  lMovie = new Movie(this, filenamePath);
-  rMovie = new Movie(this, filenamePath);
-  savedLeftFrame = leftFrame;
-  savedRightFrame = rightFrame;
-  videoSetup(lMovie);
-  videoSetup(rMovie);
-  setFrame(lMovie, leftFrame);
-  setFrame(rMovie, rightFrame);
-
-  String vFile = configuration[OUTPUT_FOLDER]+File.separator+name+"_"+convert(counter)+
+  boolean success = true;
+  vFile = configuration[OUTPUT_FOLDER]+File.separator+name+"_"+convert(counter)+
     "_"+convert(leftFrame)+"_"+convert(rightFrame)+"_2x1"+outputVideoType;
   if (DEBUG) println("Create video file " + vFile);
 
+  if (videoExport != null) {
+    pg.dispose();
+  }
   try {
     if (vFormat == FULL_WIDTH_SBS) {
-      pg = createGraphics(2*lMovie.width, lMovie.height);
+      pg = createGraphics(2*movie.width, movie.height);
       videoExport = new VideoExport(this, vFile, pg);
     } else {
       videoExport = new VideoExport(this, vFile);
@@ -65,11 +61,29 @@ void videoSetup() {
     ex.printStackTrace(logger);
     logger.flush();
   }
-  if (DEBUG) println("constructor: " + videoExport.toString()+ videoExport.ffmpegFound());
   videoExport.setQuality(70, 128);
   //videoExport.setFrameRate(movie.sourceFrameRate);  // 30 default or uncomment for input movie framerate
   videoExport.startMovie();
   if (DEBUG) println("startMovie() "+videoExport.toString());
+  if (videoExport.getFFmpegFound()) {
+    if (DEBUG) println("constructor: " + videoExport.toString());
+  } else {
+    println("Configuration Error: "+ videoExport.ffmpegFound());
+    success = false;
+  }
+
+  if (success) {
+    lMovie = new Movie(this, filenamePath);
+    rMovie = new Movie(this, filenamePath);
+    savedLeftFrame = leftFrame;
+    savedRightFrame = rightFrame;
+    videoSetup(lMovie);
+    videoSetup(rMovie);
+    setFrame(lMovie, leftFrame);
+    setFrame(rMovie, rightFrame);
+    if (DEBUG) println("after setFrame="+success);
+  }
+  return success;
 }
 
 private void videoSetup(Movie mov) {
@@ -136,7 +150,6 @@ void videoDraw(boolean stop) {
   setFrame(lMovie, leftFrame);
   setFrame(rMovie, rightFrame);
   if (rightFrame >getLength(rMovie) || stop) {
-    if (DEBUG) println("Video saved "+ videoExport.toString());
     videoExport.endMovie();
     videoExport.dispose();
     lMovie.stop();
@@ -146,6 +159,8 @@ void videoDraw(boolean stop) {
     lMovie = null;
     rMovie = null;
     saveVideo = FINISHED_VIDEO;
-    displayMessage("Saved 3D SBS Video "+configuration[OUTPUT_FOLDER]+File.separator+name+"_2x1.mp4", 60);
+    log("Save video " + vFile);
+    //displayMessage("Saved 3D SBS Video: "+configuration[OUTPUT_FOLDER]+File.separator+name+"_2x1.mp4", 60);
+    displayMessage("Saved 3D SBS Video: "+vFile, 60);
   }
 }

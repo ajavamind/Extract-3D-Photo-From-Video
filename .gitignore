@@ -9,3 +9,5 @@ application.windows64
 application.macosx
 windows-amd64
 ffmpeg.txt
+Extract3DPhoto/data/settings.json
+*.log

@@ -165,6 +165,9 @@ void fileSelected(File selection) {
     filename = selection.getName();
     if (DEBUG) println("filenamePath="+filenamePath);
     if (DEBUG) println("filename="+filename);
+    configuration[INPUT_FILENAME] = filename;
+    configuration[INPUT_FILENAME_PATH] = filenamePath;
+    saveConfig(configuration);
     newVideo = true;
     resetSavedFn();
     counter = 1;
@@ -174,10 +177,10 @@ void fileSelected(File selection) {
 
 void folderSelected(File selection) {
   if (selection == null) {
-    if (DEBUG) println("No Output Folder Selected.");
+    if (DEBUG) println("No Output Folder Selected. Using Folder: "+ configuration[OUTPUT_FOLDER]);
     displayMessage("No Output Folder Selected. Using Folder: "+ configuration[OUTPUT_FOLDER], 60);
   } else {
-    if (DEBUG) println("Photo Output Folder selected " + selection.getAbsolutePath());
+    if (DEBUG) println("Photo/Video Output Folder selected " + selection.getAbsolutePath());
     configuration[OUTPUT_FOLDER] = selection.getAbsolutePath();
     displayMessage("Photo Output Folder Selected " + selection.getAbsolutePath(), 60);
     saveConfig(configuration);

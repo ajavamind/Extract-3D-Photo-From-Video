@@ -2,6 +2,7 @@
 // 1) remove package and import references to windows win32, JOptionPane and import PrintWriter
 // 2) added error and debug logging to file in data folder in sketch path
 // 3) replaces add library for Video Export-for-Processing in Processing SDK
+
 /**
  * Video Export
  * Simple video file exporter.
@@ -241,6 +242,10 @@ public class VideoExport {
     return VERSION;
   }
 
+  public boolean getFFmpegFound() {
+    return ffmpegFound;
+  }
+  
   public String ffmpegFound() {
     String status = ffmpegFound==true? " ffmpeg found" : " ffmpeg not found";
     return status;
@@ -667,7 +672,6 @@ public class VideoExport {
           ffmpegOutputLog = null;
         }
 
-        println(outputFilePath + " saved.");
       }
       catch (InterruptedException e) {
         println("Waiting for ffmpeg timed out!");
@@ -806,7 +810,7 @@ public class VideoExport {
   static PrintWriter logger;
   
   public static void beginLogger(PApplet pApp) {
-    logger = pApp.createWriter(pApp.sketchPath("data") + File.separator + "videoExport.log");
+    logger = pApp.createWriter(pApp.sketchPath("log") + File.separator + "videoExport.log");
   }
 
   public static void println(String msg) {

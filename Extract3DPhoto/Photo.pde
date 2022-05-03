@@ -34,6 +34,7 @@ void ePhotoDraw() {
 
   PImage tmp = movie.copy();
   tmp.save(eFile);
+  log("Save photo "+eFile);
   eFrame++;
   //leftFrame++;
   //rightFrame++;
@@ -80,8 +81,10 @@ void lrPhotoDraw() {
 
   PImage tmpl = lMovie.copy();
   tmpl.save(leftFile);
+  log("Save left photo "+leftFile);
   PImage tmpr = rMovie.copy();
   tmpr.save(rightFile);
+  log("Save right photo "+rightFile);
 
   leftFrame++;
   rightFrame++;
@@ -114,21 +117,22 @@ void savePhoto(String fn, String prefix, boolean saveName, boolean highRes) {
       savedLentFn[frameType - FRAME_TYPE_BASE_LENTICULAR] = lfn;
     }
     save(lfn);
+    log("Save photo "+lfn);
   } else {
     if (highRes) {
       // highest resolution but NO shift vertical or horizontal for alignment of stereo window
       PImage tmp = movie.copy();
       tmp.save(lfn);
-      displayMessage("Saved original resolution: "+lfn, 30);
+      log("Save photo "+lfn);
+      displayMessage("Saved original resolution: "+lfn, 60);
     } else {
       savedAnaglyphFn = lfn;
-      displayMessage("Saved: "+lfn, 30);
+      displayMessage("Saved: "+lfn, 60);
       screen.save(lfn);
+      log("Save photo "+lfn);
     }
   }
-
-  if (DEBUG) println("Save Photo: " + lfn);
-  //displayMessage(lfn, 60);
+  if (DEBUG) println("savePhoto() " + lfn);
 }
 
 private String convert(int value) {

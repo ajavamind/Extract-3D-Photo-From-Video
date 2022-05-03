@@ -66,6 +66,8 @@ static final int KEYCODE_MEDIA_RECORD = 130;
 static final int KEYCODE_MEDIA_PAUSE = 127;
 static final int KEYCODE_MOVE_HOME = 122;
 static final int KEYCODE_MOVE_END  = 123;
+static final int KEYCODE_TILDE_QUOTE = 192;
+static final int KEYCODE_SINGLE_QUOTE = 222;
 
 // lastKey and lastKeyCode are handled in the draw loop
 int lastKey;
@@ -118,6 +120,9 @@ boolean keyUpdate() {
     if (showHelp > NO_HELP) {
       showHelp = INFO;
     }
+    break;
+  case KEYCODE_TILDE_QUOTE:
+    screenshot = true;
     break;
   case KEYCODE_SLASH: // debug output including stereo window parallax offset
     parallax = saveMouseX - rightMouseX;
@@ -270,7 +275,7 @@ boolean keyUpdate() {
       updated = true;
       //savePhoto(name+"_"+counter+"_"+getFrame(movie)+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);
     } else {
-      displayMessage("Not Lenticular Mode.", 30);
+      displayMessage("Not Lenticular Mode.", 60);
     }
     break;
   case KEYCODE_D: // set mode to 3D
@@ -336,19 +341,19 @@ boolean keyUpdate() {
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("data") + File.separator + "makeSBS.bat");
       launch(sketchPath("data") + File.separator + "makeSBS.bat "+ saved3DFn[0] + " " + saved3DFn[1] + " "+ 
         configuration[OUTPUT_FOLDER]+File.separator +name + "_"+counter+"_"+leftFrame+"L"+rightFrame+"R");
-      displayMessage("Save SBS 3D Photo", 30);
+      displayMessage("Save SBS 3D Photo", 60);
     } else if (mode == MODE_4V) {
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("data") + File.separator +"make4v.bat");
       launch(sketchPath("data") + File.separator + "make4v.bat "+ saved4VFn[0] + " " + saved4VFn[1] + " "+ 
         saved4VFn[2] + " " + saved4VFn[3] + " " + 
         configuration[OUTPUT_FOLDER]+File.separator +name+"_"+counter+"_"+leftFrame+"LL"+leftMiddleFrame+"LM"+rightMiddleFrame+"RM"+rightFrame+"RR");
-      displayMessage("Save 4V 3D Photo", 30);
+      displayMessage("Save 4V 3D Photo", 60);
     } else if (mode == MODE_LENTICULAR) { // Note: incomplete work in progress
       if (DEBUG) println("Launch Windows Batch File   "+sketchPath("data") + File.separator +"makeLGP.bat");
       launch(sketchPath("data") + File.separator + "makeLGP.bat "+ configuration[OUTPUT_FOLDER] + File.separator + name + "_" + counter + " " + 
         savedLentFn[4] + " " + savedLentFn[5] + " " + savedLentFn[6] + " " + savedLentFn[7] + " " +
         savedLentFn[0] + " " + savedLentFn[1] + " " + savedLentFn[2] + " " + savedLentFn[3] );
-      displayMessage("Save Quilt 3D Photo", 30);
+      displayMessage("Save Quilt 3D Photo", 60);
     }
     break;
   case KEYCODE_L:
@@ -401,7 +406,7 @@ boolean keyUpdate() {
       break;
     }
     if (saveMouseX == 0 || saveMouseY == 0) {
-      displayMessage("Left Frame NOT Selected!", 30);
+      displayMessage("Left Frame NOT Selected!", 60);
       break;
     } else {
       offsetX = saveMouseX - lastMouseX;
