@@ -102,6 +102,7 @@ int lrFrameDiff = 0;
 int savedLeftFrame = 0; // for video output
 int savedRightFrame = 0; // for video output
 float movieAspectRatio;
+float screenAspectRatio;
 
 // Font and Text size
 int TEXT_SIZE;  // in pixels
@@ -253,7 +254,8 @@ void initMedia() {
   // delay(2000); // To see setup() splash screen up
 
   movieAspectRatio = (float)movie.width / (float)movie.height;
-  if (DEBUG) println("movieAspectRatio="+movieAspectRatio);
+  screenAspectRatio = (float)width / (float)height;
+  if (DEBUG) println("movieAspectRatio="+movieAspectRatio+" screenAspectRatio="+screenAspectRatio);
 }
 
 void movieEvent(Movie m) {
@@ -345,7 +347,13 @@ void draw() {
       text("Exit", 10, textOffset);
       return;
     }
-    image(movie, offsetX, offsetY, float(height)*movieAspectRatio, height);
+    
+    //float ht = float(height)*movieAspectRatio;
+    //if (ht > height) ht = width;
+    //image(movie, offsetX, offsetY, ht, height);
+    //image(movie, offsetX, offsetY, float(height)*movieAspectRatio, height);
+    //image(movie, offsetX, offsetY, float(height)*screenAspectRatio, height/);
+    image(movie, offsetX, offsetY+((float)height-((float)width/movieAspectRatio)), float(height)*screenAspectRatio, width/movieAspectRatio);
     if (updated) {
       updated = false;
       savePhoto(name+"_"+convert(counter)+"_"+convert(getFrame(movie))+FRAME_TYPE_STR[frameType]+outputFileType, "", true, false);

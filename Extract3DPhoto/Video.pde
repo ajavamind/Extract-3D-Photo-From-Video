@@ -7,24 +7,26 @@
 
 VideoExport videoExport;
 
-private static final int FULL_WIDTH_SBS = 0;
+private static final int FULL_WIDTH_SBS = 0; // for 2D to 3D full SBS
 private static final int FULL_WIDTH_BORDER_SBS = 1;
 private static final int HALF_WIDTH_SBS = 2;
 private static final int FULL_WIDTH_CROP_SBS = 3;
 private static final int ROTATE = 4;
+private static final int FULL_WIDTH_SBS_MERGE = 5;  // for Qoocam EGO video inputs
 
-int vFormat = FULL_WIDTH_SBS; // FULL_WIDTH_BORDER_SBS;
-int rotate = 0; // 90;  // degrees
+//private int vFormat = FULL_WIDTH_SBS; // FULL_WIDTH_BORDER_SBS;
+private int vFormat = FULL_WIDTH_SBS_MERGE; // FULL_WIDTH_BORDER_SBS;
+private int rotate = 0; // 90;  // degrees
 
-Movie lMovie;
-Movie rMovie;
-PGraphics pg;
+private Movie lMovie;
+private Movie rMovie;
+private PGraphics pg;
 
 private static final int NO_VIDEO = 0;
 private static final int SETUP_VIDEO = 1;
 private static final int WRITE_VIDEO = 2;
 private static final int FINISHED_VIDEO = 3;
-int saveVideo = NO_VIDEO;
+private int saveVideo = NO_VIDEO;
 
 String outputVideoType = ".mp4";  // with H264 codec
 //String outputVideoType = ".avi";  // with H264 codec
@@ -45,8 +47,18 @@ boolean videoSetup() {
   }
   try {
     if (vFormat == FULL_WIDTH_SBS) {
-      pg = createGraphics(2*movie.width, movie.height);
-      videoExport = new VideoExport(this, vFile, pg);
+      if (mode == MODE_3D) {
+        pg = createGraphics(2*movie.width, movie.height);
+        videoExport = new VideoExport(this, vFile, pg);
+      } else if (mode == MODE_4V) {
+        pg = createGraphics(2*movie.width, 2*movie.height);
+        videoExport = new VideoExport(this, vFile, pg);
+      }
+    } else if (vFormat == FULL_WIDTH_SBS_MERGE) {
+      if (mode == MODE_3D) {
+        pg = createGraphics(movie.width, movie.height);
+        videoExport = new VideoExport(this, vFile, pg);
+      }
     } else {
       videoExport = new VideoExport(this, vFile);
     }
@@ -119,9 +131,7 @@ void videoDraw(boolean stop) {
   } else if (vFormat == FULL_WIDTH_BORDER_SBS) {
     image(lMovie, 0, (height-(width/2)/movieAspectRatio)/2, (width/2), (width/2)/movieAspectRatio);
     image(rMovie, width/2, (height-(width/2)/movieAspectRatio)/2, (width/2), (width/2)/movieAspectRatio);
-  }
-
-  if (vFormat == FULL_WIDTH_SBS) {
+  } else if (vFormat == FULL_WIDTH_SBS) {
     pg.beginDraw();
     pg.background(0);
     if (leftToRight) {
@@ -133,6 +143,24 @@ void videoDraw(boolean stop) {
     }
     pg.endDraw();
     image(pg, 0, height/4, width, (float) width/((float)pg.width/(float)pg.height));
+  } else if (vFormat == FULL_WIDTH_SBS_MERGE) {
+    pg.beginDraw();
+    pg.background(0);
+    if (leftToRight) {
+      pg.imageMode(CORNER);
+      pg.image(lMovie, 0, 0, lMovie.width, lMovie.height);
+      // overwrites the left image
+      pg.clip(width/2, 0, width/2, height);
+      pg.image(rMovie, 0, 0, rMovie.width, rMovie.height);
+      pg.noClip();
+    } else {
+      pg.image(lMovie, pg.width/2, 0, lMovie.width/2, rMovie.height);
+      pg.image(rMovie, -pg.width/2, 0, rMovie.width/2, rMovie.height);
+    }
+    pg.endDraw();
+    image(pg, 0, height/4, width, (float) width/((float)pg.width/(float)pg.height));
+  } else {
+    println("Invalid vFormat="+vFormat);
   }
   videoExport.saveFrame();
 

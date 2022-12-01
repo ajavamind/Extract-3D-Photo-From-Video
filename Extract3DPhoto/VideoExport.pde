@@ -53,10 +53,9 @@ import processing.data.JSONArray;
 import processing.data.JSONObject;
 import processing.data.StringList;
 
-/**
- * @example basic
- */
-
+/** 
+VideoExport class for video output
+*/
 public class VideoExport {
 
   public final static String VERSION = "0.2.3";
@@ -64,8 +63,8 @@ public class VideoExport {
   protected final static String SETTINGS_CMD_ENCODE_VIDEO = "encode_video";
   protected final static String SETTINGS_CMD_ENCODE_AUDIO = "encode_audio";
   protected final static String FFMPEG_PATH_UNSET = "ffmpeg_path_unset";
-  protected static JSONArray CMD_ENCODE_AUDIO_DEFAULT;
-  protected static JSONArray CMD_ENCODE_VIDEO_DEFAULT;
+  protected JSONArray CMD_ENCODE_AUDIO_DEFAULT;
+  protected JSONArray CMD_ENCODE_VIDEO_DEFAULT;
   protected final String ffmpegMetadataComment = "Made with " +
     "Video Export for Processing - https://git.io/vAXLk";
   protected ProcessBuilder processBuilder;
@@ -238,7 +237,7 @@ public class VideoExport {
    *
    * @return String
    */
-  public static String version() {
+  public String version() {
     return VERSION;
   }
 
@@ -786,7 +785,7 @@ public class VideoExport {
     endLogger();
   }
 
-  private static JSONArray toJSONArray(String s) {
+  private JSONArray toJSONArray(String s) {
     return new JSONArray(new StringList(s.split(" ")));
   }
 
@@ -807,19 +806,19 @@ public class VideoExport {
 
 ////////////////////////////////////////////////////////////////////////////
 
-  static PrintWriter logger;
+  PrintWriter logger;
   
-  public static void beginLogger(PApplet pApp) {
+  public void beginLogger(PApplet pApp) {
     logger = pApp.createWriter(pApp.sketchPath("log") + File.separator + "videoExport.log");
   }
 
-  public static void println(String msg) {
+  public void println(String msg) {
     System.out.println(msg);
     logger.println(msg);
     logger.flush();
   }
 
-  public static void endLogger() {
+  public void endLogger() {
     logger.close();
   }
 }

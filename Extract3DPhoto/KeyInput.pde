@@ -291,6 +291,8 @@ boolean keyUpdate() {
   case KEYCODE_V: // save 3D SBS video 
     if (mode == MODE_3D && lrFrameDiff > 0) {
       saveVideo = SETUP_VIDEO;
+    } else if (mode == MODE_4V && lrFrameDiff > 0) {
+      saveVideo = SETUP_VIDEO;
     } else {
       displayMessage("Cannot save 3D video, not in 3D mode.", 60);
     }
@@ -401,6 +403,7 @@ boolean keyUpdate() {
       lrFrameDiff = rightFrame - leftFrame + 1;
     } else if (mode == MODE_4V) {
       frameType = FRAME_TYPE_RIGHT_RIGHT;
+      lrFrameDiff = rightFrame - leftFrame + 1;
       rightFrame = getFrame(movie);
     } else {
       break;
